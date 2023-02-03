@@ -2,7 +2,7 @@
 Scripts for figures and results in lasTEq paper
 
 
-### Main_Figures
+### Figures_Rscripts
 Rscripts used to generate main figures.
 
 
