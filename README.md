@@ -1,10 +1,10 @@
 # lasTEq_paper
 Scripts for figures and results in lasTEq paper
 
-## Main_Figures Folder
+## Main_Figures
 Rscripts used to generate main figures.
 
-## Data_lists Folder
+## Data_lists
 Containing supplementary information about data used.
 
 1. Used_SG-Nex_accession_list.xlsx: Execel file contains information about used samples in SG-NEx study with sample ID.
