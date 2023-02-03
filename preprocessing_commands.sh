@@ -1,4 +1,4 @@
-##### Please assign right path to the files accordingly #####
+##### Please modify to assign right path to the files accordingly #####
 
 ### 1. Processing Long-read ###
 ## Prepare data
