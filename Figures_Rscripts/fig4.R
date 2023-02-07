@@ -80,8 +80,8 @@ correlation <- function(combined_dataset,cell_line_name){
   
   ### change to TPM ### use sum of coding genes as library size
   long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39037997", comment.char="#")
-  short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39038000", comment.char="#")
-  short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.SQUIRE.squire_map.library1.concat_file_Library1_B.fastq.bam) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
+  short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39098504", comment.char="#")
+  short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
   long_read_fc_coding_gene_cleanup$rate <- as.numeric(long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam) / as.numeric(long_read_fc_coding_gene_cleanup$Length)
   
   library_size_short = sum(short_read_fc_coding_gene_cleanup$rate)
