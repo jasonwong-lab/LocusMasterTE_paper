@@ -17,7 +17,7 @@ featureCounts -T 20 -R BAM --verbose -O -L -M -a $te_gtf processed.bam
 $short_fq1=short_read_fastq_pair1
 $short_fq2=short_read_fastq_pair2
 
-## star commands(STAR-2.7.9a Version)
+## star commands(STAR-2.5.3a Version)
 # star index
 STAR --genomeChrBinNbits 15 --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles $fa --sjdbGTFfile $te_gtf --limitGenomeGenerateRAM 3762779324690
 # run star
