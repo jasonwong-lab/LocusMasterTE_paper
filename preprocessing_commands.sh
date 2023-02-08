@@ -14,7 +14,6 @@ samtools view -bS processed.sam > processed.bam
 featureCounts -T 20 -R BAM --verbose -O -L -M -a $te_gtf processed.bam
 
 ### 2. Processing Short-read ###
-$gene_gtf=Gene_gtf_from_Gencode
 $short_fq1=short_read_fastq_pair1
 $short_fq2=short_read_fastq_pair2
 
@@ -22,7 +21,7 @@ $short_fq2=short_read_fastq_pair2
 # star index
 STAR --genomeChrBinNbits 15 --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles $fa --sjdbGTFfile $gene_gtf --limitGenomeGenerateRAM 3762779324690
 # run star
-STAR --genomeDir STAR_index --runThreadN 15 --outFilterMultimapNmax 500 --readFilesIn $short_fq1 $short_fq2 --outSAMtype BAM SortedByCoordinate --quantMode GeneCounts
+~/STAR-2.5.3a/source/STAR --runThreadN 20 --clip3pNbases 0 --outFilterMultimapNmax 100 --winAnchorMultimapNmax 100 --genomeDir STAR_index --readFilesIn $short_fq1 $short_fq2 --outFileNamePrefix star_output --outSAMtype BAM Unsorted --outSAMattributes All --outSAMstrandField intronMotif --outSAMattrIHstart 0 --sjdbGTFfile $te_gtf --sjdbOverhang 99 --twopassMode Basic
 
 ### 3. Generating Simulated Short-read ###
 $gtf_combined=Combination_TE+Gene_GTF
