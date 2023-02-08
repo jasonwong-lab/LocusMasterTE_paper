@@ -14,7 +14,7 @@ long_read <- read.delim("https://figshare.com/ndownloader/files/39037991", comme
 ## change to TPM counts
 long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39037997", comment.char="#")
 short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39149033", comment.char="#")
-short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
+short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup$X.storage2.jwlab.sandy.HCT116.HCT116_14_12.final_star.HCT116_14_12Aligned.sortedByCoord.out.bam) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
 long_read_fc_coding_gene_cleanup$rate <- as.numeric(long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam) / as.numeric(long_read_fc_coding_gene_cleanup$Length)
 
 library_size_short = sum(short_read_fc_coding_gene_cleanup$rate)
@@ -25,7 +25,7 @@ tpm3 <- function(counts,len) {
   return(t(t(x)*1e6))
 }
 
-short_read$TPM <- (tpm3(as.numeric(short_read$X.storage2.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam), as.numeric(short_read$Length)))/library_size_short
+short_read$TPM <- (tpm3(as.numeric(short_read$X.storage2.jwlab.sandy.HCT116.HCT116_14_12.final_star.HCT116_14_12Aligned.sortedByCoord.out.bam), as.numeric(short_read$Length)))/library_size_short
 short_read <- short_read[!is.infinite(rowSums(short_read$TPM)),]
 
 long_read$TPM <- (tpm3(as.numeric(long_read$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam), as.numeric(long_read$Length)))/library_size_long
@@ -61,7 +61,7 @@ combined_short_long_subF <- combined_short_long_subF[,c(1,2,4)]
 
 ## data preparation for coding genes - counted by featureCounts
 long_read_fc_coding_gene_cleanup$TPM <- (tpm3(as.numeric(long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam), as.numeric(long_read_fc_coding_gene_cleanup$Length)))/library_size_long
-short_read_fc_coding_gene_cleanup$TPM <- (tpm3(as.numeric(short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam), as.numeric(short_read_fc_coding_gene_cleanup$Length)))/library_size_short
+short_read_fc_coding_gene_cleanup$TPM <- (tpm3(as.numeric(short_read_fc_coding_gene_cleanup$X.storage2.jwlab.sandy.HCT116.HCT116_14_12.final_star.HCT116_14_12Aligned.sortedByCoord.out.bam), as.numeric(short_read_fc_coding_gene_cleanup$Length)))/library_size_short
 
 
 ### 1. Venn Diagram ###
@@ -74,7 +74,7 @@ long_short_gg_subf <- list("Long Read" = c(combined_short_long_subF$subF[combine
 p_subF <- ggvenn(long_short_gg_subf,stroke_size = 0.5, set_name_size=4, text_size = 4) +scale_fill_npg()
 
 ## coding genes
-long_short_gg_cd <- list("Long Read" = c(long_read_fc_coding_gene_cleanup$Geneid[long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam != 0]), " Short Read" = c(short_read_fc_coding_gene_cleanup$Geneid[short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam != 0]))
+long_short_gg_cd <- list("Long Read" = c(long_read_fc_coding_gene_cleanup$Geneid[long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam != 0]), " Short Read" = c(short_read_fc_coding_gene_cleanup$Geneid[short_read_fc_coding_gene_cleanup$X.storage2.jwlab.sandy.HCT116.HCT116_14_12.final_star.HCT116_14_12Aligned.sortedByCoord.out.bam != 0]))
 p_cd <- ggvenn(long_short_gg_cd,stroke_size = 0.5, set_name_size=4, text_size = 4) +scale_fill_npg()
 
 ### 2. Correlation Plot ###
