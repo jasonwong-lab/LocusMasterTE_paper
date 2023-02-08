@@ -19,9 +19,14 @@ $short_fq2=short_read_fastq_pair2
 
 ## star commands(STAR-2.7.9a Version)
 # star index
-STAR --genomeChrBinNbits 15 --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles $fa --sjdbGTFfile $gene_gtf --limitGenomeGenerateRAM 3762779324690
+STAR --genomeChrBinNbits 15 --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles $fa --sjdbGTFfile $te_gtf --limitGenomeGenerateRAM 3762779324690
 # run star
-~/STAR-2.5.3a/source/STAR --runThreadN 20 --clip3pNbases 0 --outFilterMultimapNmax 100 --winAnchorMultimapNmax 100 --genomeDir STAR_index --readFilesIn $short_fq1 $short_fq2 --outFileNamePrefix star_output --outSAMtype BAM Unsorted --outSAMattributes All --outSAMstrandField intronMotif --outSAMattrIHstart 0 --sjdbGTFfile $te_gtf --sjdbOverhang 99 --twopassMode Basic
+~/STAR-2.5.3a/source/STAR --runThreadN 20 --genomeDir STAR_index \
+   --readFilesIn $short_fq1 $short_fq2 --readFilesCommand zcat --outFileNamePrefix STAR_output \
+   --outSAMtype BAM Unsorted --outSAMstrandField intronMotif --outSAMattributes All --outSAMattrIHstart 0 \
+   --outFilterMultimapNmax 100 --outFilterScoreMinOverLread 0.4 --outFilterMatchNminOverLread 0.4 --clip3pNbases 0 \
+   --winAnchorMultimapNmax 100 --alignEndsType EndToEnd --alignEndsProtrude 100 DiscordantPair --chimSegmentMin 250 \
+   --sjdbGTFfile $te_gtf --sjdbOverhang 249 --twopassMode Basic
 
 ### 3. Generating Simulated Short-read ###
 $gtf_combined=Combination_TE+Gene_GTF
