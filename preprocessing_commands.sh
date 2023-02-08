@@ -21,7 +21,7 @@ $short_fq2=short_read_fastq_pair2
 # star index
 STAR --genomeChrBinNbits 15 --runMode genomeGenerate --genomeDir STAR_index --genomeFastaFiles $fa --sjdbGTFfile $te_gtf --limitGenomeGenerateRAM 3762779324690
 # run star
-~/STAR-2.5.3a/source/STAR --runThreadN 20 --genomeDir STAR_index \
+STAR --runThreadN 20 --genomeDir STAR_index \
    --readFilesIn $short_fq1 $short_fq2 --readFilesCommand zcat --outFileNamePrefix STAR_output \
    --outSAMtype BAM Unsorted --outSAMstrandField intronMotif --outSAMattributes All --outSAMattrIHstart 0 \
    --outFilterMultimapNmax 100 --outFilterScoreMinOverLread 0.4 --outFilterMatchNminOverLread 0.4 --clip3pNbases 0 \
