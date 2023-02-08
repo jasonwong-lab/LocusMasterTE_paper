@@ -8,12 +8,12 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
                  axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 
 ## Load the Datasets ##
-short_read <- read.delim("https://figshare.com/ndownloader/files/39098498", comment.char="#")
+short_read <- read.delim("https://figshare.com/ndownloader/files/39149036", comment.char="#")
 long_read <- read.delim("https://figshare.com/ndownloader/files/39037991", comment.char="#")
 
 ## change to TPM counts
 long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39037997", comment.char="#")
-short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39098504", comment.char="#")
+short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/39149033", comment.char="#")
 short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.HCT116_14_12.starAligned.sortedByCoord.out.bam) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
 long_read_fc_coding_gene_cleanup$rate <- as.numeric(long_read_fc_coding_gene_cleanup$X.storage.jwlab.sandy.HCT116.minimap2_genome.HCT116_mRNA_long.bam) / as.numeric(long_read_fc_coding_gene_cleanup$Length)
 
