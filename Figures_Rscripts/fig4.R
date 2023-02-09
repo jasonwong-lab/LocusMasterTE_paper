@@ -8,7 +8,7 @@ combined_dataset_ERR6937791 <- read.delim("https://figshare.com/ndownloader/file
 combined_dataset_ERR6937794 <- read.delim("https://figshare.com/ndownloader/files/39038390", comment.char="#")
 combined_dataset_ERR6937797 <- read.delim("https://figshare.com/ndownloader/files/39038396", comment.char="#")
 combined_dataset_ERR6937800 <- read.delim("https://figshare.com/ndownloader/files/39038411", comment.char="#")
-combined_dataset_HCT116 <- read.delim("https://figshare.com/ndownloader/files/39038414", comment.char="#")
+combined_dataset_HCT116 <- read.delim("https://figshare.com/ndownloader/files/39161666", comment.char="#")
 
 age_process <- function(combined_age){
   combined_age$lasteq[combined_age$lasteq < 0.01] <- 0
@@ -113,7 +113,7 @@ correlation <- function(combined_dataset,cell_line_name){
                   conf.int = TRUE)+My_Theme
   p1 <- p1 + stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),size = 4)
   p1 <- p1 + ggtitle("Telescope") + xlab("log(TPM by Telescope)") + ylab("log(TPM by Long Read)")
-
+  
   
   p2 <- ggscatter(combined_dataset_cor_common[,c(1,3)], y = "longTPM", x = "lasteqTPM",
                   add = "reg.line", color = "#7E6148B2",
