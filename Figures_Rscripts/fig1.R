@@ -176,8 +176,8 @@ p4 <- p4 + ggtitle("% Mapped by RSEM")+theme(legend.position="right")
 
 ### 5. where EM can not be the ultimate solution ###
 
-exclude <- read.delim("https://figshare.com/ndownloader/files/39038009", comment.char="#")
-average <- read.delim("https://figshare.com/ndownloader/files/39038003", comment.char="#")
+exclude <- read.delim("https://figshare.com/ndownloader/files/39164168", comment.char="#")
+average <- read.delim("https://figshare.com/ndownloader/files/39164165", comment.char="#")
 
 
 EM_not_ultimate <- average[,c(1,3)]
