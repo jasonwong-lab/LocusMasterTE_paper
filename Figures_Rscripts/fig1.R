@@ -147,19 +147,15 @@ p3_box <- p3_box+ xlab("")+ylab("Age(milliDiv)")+My_Theme+ theme(legend.position
 p3_box <- p3_box+ggtitle("Mean(Detected TEs age)")+scale_y_continuous(limits=c(150, 340), breaks=c(200, 250, 300), labels=c(200, 250, 300))
 
 ### 4. RSEM Unique+Multi
-tot_short = 124609783
-unmap_short = 117598013
-map_1_short = 2188380
-map_m_short = 4823390
-map_tot_short = 2188380+4823390
+map_1_short = 320320-105560
+map_m_short = 105560
+map_tot_short = 320320
 map_1_short = map_1_short*100/map_tot_short
 map_m_short = map_m_short*100/map_tot_short
 
-tot_long = 3265838
-unmap_long = 3248232
-map_1_long = 7106
-map_m_long = 10500
-map_tot_long = 7106+10500
+map_1_long = 300656-43826
+map_m_long = 43826
+map_tot_long = 300656
 map_1_long = map_1_long*100/map_tot_long
 map_m_long = map_m_long*100/map_tot_long
 
