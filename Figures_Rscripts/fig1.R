@@ -168,7 +168,7 @@ p4_df$Long <- c(map_1_long,map_m_long)
 p4_df <- melt(p4_df)
 p4 <- ggplot(p4_df, aes(x = variable, y=value, fill=label, group=label)) + geom_col(width=0.7) + scale_fill_manual(values=c("#8491B4FF", "#91D1C2FF"))
 p4 <- p4 + xlab("")+ylab("Percentage(%)") + My_Theme
-p4 <- p4 + ggtitle("% Mapped by RSEM")+theme(legend.position="right")
+p4 <- p4 + theme(legend.position="right")
 
 ### 5. where EM can not be the ultimate solution ###
 
