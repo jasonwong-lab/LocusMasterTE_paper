@@ -4,7 +4,7 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
                  axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 
 ## Load dataset
-combined <- read.delim("https://figshare.com/ndownloader/files/39038678", comment.char="#")
+combined <- read.delim("https://figshare.com/ndownloader/files/39305180", comment.char="#")
 
 combined_extract <- combined[,c(1,4:11)]
 f1mat <- data.frame(rep(0,3))
@@ -42,8 +42,8 @@ for(idx in c(3:9)){
 
 graph_list <- data.frame(c(3:9))
 graph_list$color <- c("#E64B35FF","#4DBBD5FF","#00A087FF","#3C5488FF","#F39B7FFF","#8491B4FF","#91D1C2FF")
-graph_list$title <- c("Telescope","lasTEq\n(rescue_short = 0)", "lasTEq\n(rescue_short = 1e-50)","Unique Counts","Best Counts","RSEM","SalmonTE")
-graph_list$file_title <- c("Telescope","Our_Method", "Our_Method_with_rescue_short","uniq","best","RSEM","salmonTE")
+graph_list$title <- c("Telescope","lasTEq", "SQuIRE","Unique Counts","Best Counts","RSEM","SalmonTE")
+graph_list$file_title <- c("Telescope","Our_Method", "SQuIRE","uniq","best","RSEM","salmonTE")
 
 for(j in c(1:nrow(graph_list))){
   idx <- graph_list$c.3.9.[j]
@@ -77,8 +77,8 @@ for(j in c(1:nrow(graph_list))){
 ## f1 score = 2*(precision * recall)/(precision+recall)
 f1mat <- data.frame(t(f1mat))
 f1mat_plot <- cbind("label"=rownames(f1mat),f1mat)
-f1mat_plot$label <- c("Telescope","lasTEq\n(rescue_short = 0)", "lasTEq\n(rescue_short = 1e-50)","Unique Counts","Best Counts","RSEM","SalmonTE")
-f1mat_plot$label <- factor(f1mat_plot$label, levels=c("Unique Counts","Best Counts","RSEM","Telescope","lasTEq\n(rescue_short = 0)", "lasTEq\n(rescue_short = 1e-50)","SalmonTE"))
+f1mat_plot$label <- c("Telescope","lasTEq", "SQuIRE","Unique Counts","Best Counts","RSEM","SalmonTE")
+f1mat_plot$label <- factor(f1mat_plot$label, levels=c("Unique Counts","Best Counts","RSEM","Telescope","lasTEq", "SQuIRE","SalmonTE"))
 
 f1mat_precision <- ggplot(aes(x = Recall, y = Precision,label=label), data = f1mat_plot) +geom_point(aes(fill=label), shape=21, size= 6, color="black")
 f1mat_precision <- f1mat_precision +scale_fill_manual(values=c("#3C5488FF","#F39B7FFF","#8491B4FF","#E64B35FF","#4DBBD5FF","#00A087FF","#91D1C2FF"))
