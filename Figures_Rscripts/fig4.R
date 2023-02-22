@@ -3,15 +3,14 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
                  axis.text.x = element_text(colour = "black",size = 10),
                  axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 ### 1. Age Analysis ###
-combined_dataset_ERR6937788 <- read.delim("https://figshare.com/ndownloader/files/39038408", comment.char="#")
-combined_dataset_ERR6937791 <- read.delim("https://figshare.com/ndownloader/files/39038402", comment.char="#")
-combined_dataset_ERR6937794 <- read.delim("https://figshare.com/ndownloader/files/39038390", comment.char="#")
-combined_dataset_ERR6937797 <- read.delim("https://figshare.com/ndownloader/files/39038396", comment.char="#")
-combined_dataset_ERR6937800 <- read.delim("https://figshare.com/ndownloader/files/39038411", comment.char="#")
-combined_dataset_HCT116 <- read.delim("https://figshare.com/ndownloader/files/39161666", comment.char="#")
+combined_dataset_ERR6937788 <- read.delim("https://figshare.com/ndownloader/files/39359537", comment.char="#")
+combined_dataset_ERR6937791 <- read.delim("https://figshare.com/ndownloader/files/39359543", comment.char="#")
+combined_dataset_ERR6937794 <- read.delim("https://figshare.com/ndownloader/files/39359549", comment.char="#")
+combined_dataset_ERR6937797 <- read.delim("https://figshare.com/ndownloader/files/39359555", comment.char="#")
+combined_dataset_ERR6937800 <- read.delim("https://figshare.com/ndownloader/files/39359558", comment.char="#")
+combined_dataset_HCT116 <- read.delim("https://figshare.com/ndownloader/files/39359567", comment.char="#")
 
 age_process <- function(combined_age){
-  combined_age$lasteq[combined_age$lasteq < 0.01] <- 0
   combined_age <- combined_age[which(combined_age$short != 0 | combined_age$lasteq != 0),]
   combined_age$diff_raw <- as.numeric(combined_age$short) - as.numeric(combined_age$lasteq)
   combined_age$corrected_by_modified_telescope <- "not captured"
@@ -64,11 +63,28 @@ age_combined_plot <- age_combined_plot + theme(axis.title.x=element_blank(),
                                                strip.text.x = element_blank()) + ylab("Age(milliDiv)") +stat_compare_means(label =  "p.signif", label.x = 1.5)
 age_combined_plot <- age_combined_plot + ggtitle("Age Distribution of TEs")
 
+ggsave(file="/storage/jwlab/sandy/Figures/final/age.pdf", plot=age_combined_plot, bg = 'white', width = 12, height = 8, units = 'cm', dpi = 600)
+
 ### Correlation Plot ###
 
 library(corrplot)
 cell_line_name <- "own_Hct116"
 combined_dataset <- combined_dataset_HCT116
+
+cell_line_name <- "A549"
+combined_dataset <- combined_dataset_ERR6937788
+
+cell_line_name <- "HepG2"
+combined_dataset <- combined_dataset_ERR6937791
+
+cell_line_name <- "Hct116"
+combined_dataset <- combined_dataset_ERR6937794
+
+cell_line_name <- "K562"
+combined_dataset <- combined_dataset_ERR6937797
+
+cell_line_name <- "MCF7"
+combined_dataset <- combined_dataset_ERR6937800
 
 correlation <- function(combined_dataset,cell_line_name){
   combined_dataset_cor <- combined_dataset[,c(1,2,3:5)]
@@ -113,7 +129,7 @@ correlation <- function(combined_dataset,cell_line_name){
                   conf.int = TRUE)+My_Theme
   p1 <- p1 + stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),size = 4)
   p1 <- p1 + ggtitle("Telescope") + xlab("log(TPM by Telescope)") + ylab("log(TPM by Long Read)")
-  
+
   
   p2 <- ggscatter(combined_dataset_cor_common[,c(1,3)], y = "longTPM", x = "lasteqTPM",
                   add = "reg.line", color = "#7E6148B2",
@@ -130,10 +146,10 @@ cor_df <- data.frame(rep(0, 2))
 for(i in 1:5){
   cor_df <- cbind(cor_df, rep(0,2))
 }
-colnames(cor_df) <- c("ownHCT116","A549","HCT116","HepG2","K562","MCF-7")
+colnames(cor_df) <- c("inhouse","A549","HCT116","HepG2","K562","MCF-7")
 rownames(cor_df) <- c("Telescope","lasTEq")
-cor_df[1,] <- c(0.32, 0.57, 0.57,0.46,0.44,0.57)
-cor_df[2,] <- c(0.37, 0.58, 0.61,0.47,0.45,0.59)
+cor_df[1,] <- c(0.37,0.53, 0.5,0.46,0.4,0.55)
+cor_df[2,] <- c(0.39,0.57, 0.58,0.5,0.44,0.59)
 cor_df <- cbind("label"=rownames(cor_df),cor_df)
 cor_df$label <- factor(cor_df$label, levels=c("Telescope", "lasTEq"))
 cor_df <- cor_df[,c(1,3:7)]
@@ -145,7 +161,7 @@ cor_df_heatmap <- cor_df_heatmap + theme(strip.background = element_blank(), str
 cor_df_heatmap <- cor_df_heatmap + scale_color_manual(values=c("#3C5488FF","#DC0000FF"))+geom_text(aes(label=value), size=4, color="white",fontface = "bold")
 cor_df_heatmap <- cor_df_heatmap + ggtitle("Correlation with Long Read")+theme(legend.position="none")
 
-
+### 4. Histone bed file ###
 ### bed file extraction for histone ###
 histone_own_HCT116 <- combined_dataset_HCT116[,c(1,2,4,5)]
 histone_own_HCT116$diff <- histone_own_HCT116$lasteq - histone_own_HCT116$short
@@ -156,97 +172,5 @@ histone_own_HCT116$chr <- unlist(sapply(strsplit(histone_own_HCT116$label, "|", 
 histone_own_HCT116$str <- unlist(sapply(strsplit(histone_own_HCT116$label, "|", fixed=TRUE), function(x) x[2], simplify=FALSE))
 histone_own_HCT116$end <- unlist(sapply(strsplit(histone_own_HCT116$label, "|", fixed=TRUE), function(x) x[3], simplify=FALSE))
 
-## save into bed files 
-bigger1_Corrected_in_modified_telescope <- histone_own_HCT116[histone_own_HCT116$label_diff == "high_mixed", 7:9]
-bigger1_Incorrectly_measured_in_original_telescope <- histone_own_HCT116[histone_own_HCT116$label_diff == "high_short", 7:9]
-
-### 4. Histone Heatmap Plot ###
-
-## histone heatmap
-histone_df <- data.frame(rep(0, 5))
-for(i in 1:11){
-  histone_df <- cbind(histone_df, rep(0,5))
-}
-rownames(histone_df) <- c("H3K27ac","H3K27me3","H3K4me3","H3K9ac","H3K9me3")
-colnames(histone_df) <- c("correct_ownHCT116","incorrect_ownHCT116","correct_A549","incorrect_A549","correct_HCT116","incorrect_HCT116","correct_HepG2","incorrect_HepG2","correct_K562","incorrect_K562","correct_MCF-7","incorrect_MCF-7")
-
-histone_df[,1] <- c(1.97431, 0.361352, 1.79114, 1.74377, 0.437465)
-histone_df[,2] <- c(1.55554, 0.366998, 1.31739, 1.35212, 0.446571)
-
-histone_df[,3] <- c(0.353323, 0.0345828, 0.532635, 0.337217, 0.0954647)
-histone_df[,4] <- c(0.38188, 0.0559413, 0.350027, 0.335743, 0.146679)
-
-histone_df[,5] <- c(0.239359, 0.0498001, 0.146767, 0.157627, 0.0597366)
-histone_df[,6] <- c(0.251522, 0.0684533, 0.195611, 0.185631, 0.0964365)
-
-histone_df[,7] <- c(0.242406, 0.040903, 0.114888, 0.192506, 0.0673679)
-histone_df[,8] <- c(0.148777, 0.0540486, 0.125958, 0.179852, 0.116947)
-
-histone_df[,9] <- c(0.113632, 0.0494671, 0.126207, 0.107562, 0.1461)
-histone_df[,10] <- c(0.18671, 0.0871798, 0.177329, 0.147815, 0.437465)
-
-histone_df[,11] <- c(0.196137, 0.0499715, 0.238204, 0.255244, 0.0783445)
-histone_df[,12] <- c(0.14549, 0.0930822, 0.200189, 0.164347, 0.141475)
-
-histone_df <- histone_df[,c(3:12)]
-
-histone_df <- cbind("label"=rownames(histone_df),histone_df)
-histone_df <- histone_df[,c(1,3,5,7,9,11,2,4,6,8,10)]
-colnames(histone_df) <- factor(colnames(histone_df), levels=colnames(histone_df))
-
-histone_df <- melt(histone_df)
-histone_df$variable <- as.character(histone_df$variable)
-histone_df$cell <- unlist(sapply(strsplit(histone_df$variable,"_", fixed = TRUE), function(x) x[2], simplify=FALSE))
-histone_df$group <- unlist(sapply(strsplit(histone_df$variable,"_", fixed = TRUE), function(x) x[1], simplify=FALSE))
-histone_df$group[histone_df$group=="correct"] <- "Originally_Correctly\nMeasured"
-histone_df$group[histone_df$group=="incorrect"] <- "Incorrectly\nMeasured"
-
-
-#H3K27ac
-histone_df_nec <- histone_df[which(histone_df$label =="H3K27ac"),]
-histone_heatmap <- ggplot(histone_df_nec, aes(x = group, y = cell, fill=value)) + geom_tile(color = "white", lwd = 1.5,linetype = 1)+scale_x_discrete(labels=c("Incorrectly\nMeasured", "Correctly\nMeasured")) 
-histone_heatmap <- histone_heatmap +My_Theme + theme(axis.title.x=element_blank(),axis.title.y=element_blank())
-histone_heatmap <- histone_heatmap + labs(fill = "Mean\n(Coverage)") + scale_fill_gradient2(limits=c(0, 0.4),breaks=c(0, 0.2,0.4), labels=c(0,0.2, 0.4) ,low = "white",
-                                                                                            high = "#DC0000FF",
-                                                                                            guide = "colorbar") 
-histone_heatmap <- histone_heatmap + ggtitle("H3K27ac")
-
-#H3K27me3
-histone_df_nec <- histone_df[which(histone_df$label =="H3K27me3"),]
-range(histone_df_nec$value)
-histone_heatmap <- ggplot(histone_df_nec, aes(x = group, y = cell, fill=value)) + geom_tile(color = "white", lwd = 1.5,linetype = 1)+scale_x_discrete(labels=c("Incorrectly\nMeasured", "Correctly\nMeasured")) 
-histone_heatmap <- histone_heatmap +My_Theme + theme(axis.title.x=element_blank(),axis.title.y=element_blank())
-histone_heatmap <- histone_heatmap + labs(fill = "Mean\n(Coverage)") + scale_fill_gradient(limits=c(0.02, 0.1),breaks=c(0.02, 0.06,0.1), labels=c(0.02,0.06, 0.1) ,low = "#3C5488FF",
-                                                                                           high = "white",
-                                                                                           guide = "colorbar") 
-histone_heatmap <- histone_heatmap + ggtitle("H3K27me3")
-
-#H3K4me3
-histone_df_nec <- histone_df[which(histone_df$label =="H3K4me3"),]
-range(histone_df_nec$value)
-histone_heatmap <- ggplot(histone_df_nec, aes(x = group, y = cell, fill=value)) + geom_tile(color = "white", lwd = 1.5,linetype = 1)+scale_x_discrete(labels=c("Incorrectly\nMeasured", "Correctly\nMeasured")) 
-histone_heatmap <- histone_heatmap +My_Theme + theme(axis.title.x=element_blank(),axis.title.y=element_blank())
-histone_heatmap <- histone_heatmap + labs(fill = "Mean\n(Coverage)") + scale_fill_gradient(limits=c(0, 0.6),breaks=c(0, 0.3,0.6), labels=c(0,0.3, 0.6) ,low = "white",
-                                                                                           high = "#DC0000FF",
-                                                                                           guide = "colorbar") 
-histone_heatmap <- histone_heatmap + ggtitle("H3K4me3")
-
-#H3K9ac
-histone_df_nec <- histone_df[which(histone_df$label =="H3K9ac"),]
-range(histone_df_nec$value)
-histone_heatmap <- ggplot(histone_df_nec, aes(x = group, y = cell, fill=value)) + geom_tile(color = "white", lwd = 1.5,linetype = 1)+scale_x_discrete(labels=c("Incorrectly\nMeasured", "Correctly\nMeasured")) 
-histone_heatmap <- histone_heatmap +My_Theme + theme(axis.title.x=element_blank(),axis.title.y=element_blank())
-histone_heatmap <- histone_heatmap + labs(fill = "Mean\n(Coverage)") + scale_fill_gradient(limits=c(0, 0.4),breaks=c(0, 0.2,0.4), labels=c(0,0.2, 0.4) ,low = "white",
-                                                                                           high = "#DC0000FF",
-                                                                                           guide = "colorbar") 
-histone_heatmap <- histone_heatmap + ggtitle("H3K9ac")
-
-#H3K9me3
-histone_df_nec <- histone_df[which(histone_df$label =="H3K9me3"),]
-range(histone_df_nec$value)
-histone_heatmap <- ggplot(histone_df_nec, aes(x = group, y = cell, fill=value)) + geom_tile(color = "white", lwd = 1.5,linetype = 1)+scale_x_discrete(labels=c("Incorrectly\nMeasured", "Correctly\nMeasured")) 
-histone_heatmap <- histone_heatmap +My_Theme + theme(axis.title.x=element_blank(),axis.title.y=element_blank())
-histone_heatmap <- histone_heatmap + labs(fill = "Mean\n(Coverage)") + scale_fill_gradient(limits=c(0, 0.5),breaks=c(0, 0.25,0.5), labels=c(0,0.25, 0.5) ,low = "#3C5488FF",
-                                                                                           high = "white",
-                                                                                           guide = "colorbar") 
-histone_heatmap <- histone_heatmap + ggtitle("H3K9me3")
+#write.table(histone_own_HCT116[histone_own_HCT116$label_diff == "high_mixed", 7:9], "bigger1_Corrected_in_modified_telescope.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
+#write.table(histone_own_HCT116[histone_own_HCT116$label_diff == "high_short", 7:9], "bigger1_Incorrectly_measured_in_original_telescope.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
