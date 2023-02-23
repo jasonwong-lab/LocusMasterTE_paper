@@ -7,7 +7,7 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
 ## GSVA Graph ##
 
 ### compare correlation between DNA RNA sensing and TE
-DNA_RNA_gene_TE_cor_GSVA_mod <- read.delim("https://figshare.com/ndownloader/files/39038909")
+DNA_RNA_gene_TE_cor_GSVA_mod <- read.delim("https://figshare.com/ndownloader/files/39370034")
 DNA_RNA_gene_TE_cor_GSVA_org <- read.delim("https://figshare.com/ndownloader/files/39038912")
 DNA_RNA_gene_TE_cor_GSVA_org$label <- "Telescope"
 DNA_RNA_gene_TE_cor_GSVA_mod$label <- "lasTEq"
@@ -18,7 +18,7 @@ p_cor <- p_cor + My_Theme + xlab("abs(cor.value) by Telescope")+ylab("abs(cor.va
 
 
 ## Intergenic TEs with 5kb regions
-intergenic_TE_gene_5kb <- read.delim("https://figshare.com/ndownloader/files/39038834", header=FALSE)
+intergenic_TE_gene_5kb <- read.delim("https://figshare.com/ndownloader/files/39370037", header=FALSE)
 UTR_3 <- read.delim("https://figshare.com/ndownloader/files/39044861", header=FALSE)
 UTR_3$gene <- unlist(sapply(strsplit(UTR_3$V4, "_", fixed=TRUE), function(x) x[1], simplify=FALSE))
 UTR_5 <- read.delim("https://figshare.com/ndownloader/files/39044867", header=FALSE)
