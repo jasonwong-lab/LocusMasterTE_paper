@@ -18,7 +18,7 @@ p_cor <- p_cor + My_Theme + xlab("abs(cor.value) by Telescope")+ylab("abs(cor.va
 
 
 ## Intergenic TEs with 5kb regions
-intergenic_TE_gene_5kb <- read.delim("https://figshare.com/ndownloader/files/39370052", header=FALSE, comment.char="#")
+intergenic_TE_gene_5kb <- read.delim("https://figshare.com/ndownloader/files/39370052", comment.char="#")
 UTR_3 <- read.delim("https://figshare.com/ndownloader/files/39044861", header=FALSE)
 UTR_3$gene <- unlist(sapply(strsplit(UTR_3$V4, "_", fixed=TRUE), function(x) x[1], simplify=FALSE))
 UTR_5 <- read.delim("https://figshare.com/ndownloader/files/39044867", header=FALSE)
