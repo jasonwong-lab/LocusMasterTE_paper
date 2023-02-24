@@ -10,21 +10,19 @@ library(ref_genome, character.only = TRUE)
 library(gridExtra)
 library(lsa)
 
-# YC_files_all <- read.delim("/storage2/jwlab/sandy/bam_readcount/tot/temp/TCGA-3L-AA1B-01A-11R-A37K-07/vcf_files.txt", sep="")
-# grl <- read_vcfs_as_granges(YC_files_all$files, YC_files_all$samples, ref_genome)
-# mut_mat <- mut_matrix(vcf_list = grl, ref_genome = ref_genome)
+mut_mat <- read.delim("https://figshare.com/ndownloader/files/39387143")
 
-mut_mat <- read.delim("https://figshare.com/ndownloader/files/39038888")
 mut_mat$average_common <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "common")])
 mut_mat$average_lasTEq <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "mod")])
-mut_mat$average_coding_gene <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "coding_gene")])
-colnames(mut_mat)[c(1,878:880)] <- c("Reference","common\nTEs", "lasTEq\nonly TEs", "Coding\nGenes")
-plot_96_profile(mut_mat[,c(1,878:880)])
-mut_mat <- mut_mat[,1:877]
+mut_mat$average_coding_gene <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "coding_gene_vcf_result")])
+
+colnames(mut_mat)[c(1,866:868)] <- c("Reference","common\nTEs", "lasTEq\nonly TEs", "Coding\nGenes")
+plot_96_profile(mut_mat[,c(1,866:868)])
+mut_mat <- mut_mat[,1:865]
 
 mut_mat <- rbind("cosine" = rep(0),mut_mat)
 for(i in 1:ncol(mut_mat)){
-  mut_mat[1,i] <- cosine(mut_mat$ref, mut_mat[,i])
+  mut_mat[1,i] <- cosine(mut_mat$Reference, mut_mat[,i])
 }
 
 ## box-plot
