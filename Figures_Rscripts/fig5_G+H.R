@@ -17,7 +17,7 @@ mut_mat$average_lasTEq <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "mod")
 mut_mat$average_coding_gene <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "coding_gene_vcf_result")])
 
 colnames(mut_mat)[c(1,866:868)] <- c("Reference","common\nTEs", "lasTEq\nonly TEs", "Coding\nGenes")
-plot_96_profile(mut_mat[,c(1,866:868)])
+plot_96_profile(mut_mat[,c(1,866:868)], ymax = 0.1)
 mut_mat <- mut_mat[,1:865]
 
 mut_mat <- rbind("cosine" = rep(0),mut_mat)
