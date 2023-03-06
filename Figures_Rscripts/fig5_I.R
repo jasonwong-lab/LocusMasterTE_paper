@@ -73,5 +73,5 @@ ggsurvplot(fit,
            risk.table = TRUE,
            risk.table.col = "strata", 
            linetype = "strata",
-           palette = c("#332288","#882255"),
-           ggtheme = My_Theme,xlab = "OS(time)")
+           palette = c("#DC0000FF", "#3C5488FF"),
+           ggtheme = My_Theme,xlab = "PFI(time)")
