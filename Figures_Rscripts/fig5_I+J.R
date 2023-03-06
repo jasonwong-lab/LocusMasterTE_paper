@@ -75,3 +75,19 @@ ggsurvplot(fit,
            linetype = "strata",
            palette = c("#DC0000FF", "#3C5488FF"),
            ggtheme = My_Theme,xlab = "PFI(time)")
+
+## 2 TEs expression cluster
+TCGA_COAD_TE_extract <- TCGA_COAD_TE_exp_nec_no0[rownames(TCGA_COAD_TE_exp_nec_no0) %in% tot,]
+box_plot <- melt(cbind("name"=rownames(box_plot),box_plot))
+box_plot <- box_plot[c(1:193, 195:nrow(box_plot)),]
+
+box_plot$strata <- paste0("strata",unlist(temp[match(box_plot$variable,rownames(temp)),1]))
+
+
+box_plot$strata[box_plot$strata == "strata1"] <- "Poor"
+box_plot$strata[box_plot$strata == "strata2"] <- "Good"
+
+box_plot <- box_plot[box_plot$value>0,]
+surv_box <- ggplot(box_plot, aes(x=strata, y=value, fill=strata)) + geom_boxplot(width=0.6, lwd=1) +scale_fill_manual(values=c("#3C5488FF", "#DC0000FF"))
+surv_box <- surv_box + facet_wrap(~name,scales="free", ncol=5)
+surv_box <- surv_box+ xlab("Survival Strata")+ylab("TE expression")+My_Theme
