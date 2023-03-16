@@ -7,7 +7,7 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
 ## GSVA Graph ##
 
 ### compare correlation between DNA RNA sensing and TE
-DNA_RNA_gene_TE_cor_GSVA_mod <- read.delim("https://figshare.com/ndownloader/files/39370034")
+DNA_RNA_gene_TE_cor_GSVA_mod <- read.delim("https://figshare.com/ndownloader/files/39596761")
 DNA_RNA_gene_TE_cor_GSVA_org <- read.delim("https://figshare.com/ndownloader/files/39038912")
 DNA_RNA_gene_TE_cor_GSVA_org$label <- "Telescope"
 DNA_RNA_gene_TE_cor_GSVA_mod$label <- "LocusMasterTE"
