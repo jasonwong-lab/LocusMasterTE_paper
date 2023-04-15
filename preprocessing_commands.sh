@@ -26,7 +26,7 @@ STAR --runThreadN 20 --genomeDir STAR_index \
    --outSAMtype BAM Unsorted --outSAMstrandField intronMotif --outSAMattributes All --outSAMattrIHstart 0 \
    --outFilterMultimapNmax 100 --outFilterScoreMinOverLread 0.4 --outFilterMatchNminOverLread 0.4 --clip3pNbases 0 \
    --winAnchorMultimapNmax 100 --alignEndsType EndToEnd --alignEndsProtrude 100 DiscordantPair --chimSegmentMin 250 \
-   --sjdbGTFfile $te_gtf --sjdbOverhang 249 --twopassMode Basic
+   --sjdbGTFfile $te_gtf --twopassMode Basic
 
 ### 3. Generating Simulated Short-read ###
 $gtf_combined=Combination_TE+Gene_GTF
