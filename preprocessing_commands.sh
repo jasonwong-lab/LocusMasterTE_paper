@@ -27,6 +27,8 @@ STAR --runThreadN 20 --genomeDir STAR_index \
    --outFilterMultimapNmax 100 --outFilterScoreMinOverLread 0.4 --outFilterMatchNminOverLread 0.4 --clip3pNbases 0 \
    --winAnchorMultimapNmax 100 --alignEndsType EndToEnd --alignEndsProtrude 100 DiscordantPair --chimSegmentMin 250 \
    --sjdbGTFfile $te_gtf --twopassMode Basic
+# sort by read name
+samtools collate -o Aligned_sort_name.out.bam --output-fmt BAM Aligned_sort.out.bam
 
 ### 3. Generating Simulated Short-read ###
 $gtf_combined=Combination_TE+Gene_GTF
