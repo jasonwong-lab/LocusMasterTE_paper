@@ -187,7 +187,6 @@ EM_not_ultimate$random <- unlist(random[match(EM_not_ultimate$indi_label_final,r
 EM_not_ultimate$uniq <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),6])
 EM_not_ultimate$aligned <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),5])
 
-EM_not_ultimate <- EM_not_ultimate[!str_detect(EM_not_ultimate$indi_label_final,")n"),]
 EM_not_ultimate <- EM_not_ultimate[,c(1,3,4,5,6)]
 EM_not_ultimate[is.na(EM_not_ultimate)] <- 0
 EM_not_ultimate <- EM_not_ultimate[rowSums(EM_not_ultimate[,2:5])>0,]
