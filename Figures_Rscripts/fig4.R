@@ -46,7 +46,7 @@ intergenic_TE_gene_all
 
 
 ## ------3. Survival------ ##
-TCGA_COAD_TE_exp <- read.delim("https://figshare.com/ndownloader/files/44483687")
+TCGA_COAD_TE_exp <- read.delim("https://figshare.com/ndownloader/files/44569130")
 locusmasterte_te <- read.table("https://figshare.com/ndownloader/files/44481584", quote="\"", comment.char="")
 diff_TE <- read.delim("https://figshare.com/ndownloader/files/44481530", header=FALSE)
 only_mod_imp <- diff_TE[diff_TE$V5 == "intergenic",]
