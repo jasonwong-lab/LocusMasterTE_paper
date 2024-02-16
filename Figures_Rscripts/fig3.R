@@ -5,7 +5,7 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
 
 ## --- Simulated Reads --- ##
 ## Figure 3 A-E ##
-simulated_mat <- read.delim("https://figshare.com/ndownloader/files/44176667")
+combined_extract <- read.delim("https://figshare.com/ndownloader/files/44176667")
 
 f1mat <- data.frame(rep(0,3))
 rownames(f1mat) <- c("Precision","Recall","F1")
