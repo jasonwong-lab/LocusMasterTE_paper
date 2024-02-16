@@ -181,7 +181,7 @@ p4 <- p4 + theme(legend.position="right")
 
 random <- read.delim("https://figshare.com/ndownloader/files/44176565", header=FALSE, comment.char="#")
 
-EM_not_ultimate <- hg38_gencode_rmsk_indi[,c(12,10)]
+EM_not_ultimate <- hg38_gencode_rmsk_indi[,c(13,10)]
 EM_not_ultimate$average <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),9])
 EM_not_ultimate$random <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),8])
 EM_not_ultimate$uniq <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),6])
