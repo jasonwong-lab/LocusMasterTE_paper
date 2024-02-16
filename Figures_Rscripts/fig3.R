@@ -88,7 +88,6 @@ f1mat_precision <- f1mat_precision + theme(legend.text = element_text(size=10), 
                                            axis.text.x = element_text(colour = "black",size = 10),
                                            axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 f1mat_precision <- f1mat_precision + geom_label_repel(force = 50, size=3)
-ggsave(file="/storage2/jwlab/sandy/LocusMasterTE/paper/figure/precision_recall.pdf", plot=f1mat_precision,bg = 'white', width = 8, height = 8, units = 'cm', dpi = 600)
 
 
 ## --- Cell Line --- ##
@@ -153,7 +152,6 @@ age_combined_plot <- age_combined_plot + theme(axis.title.x=element_blank(),
                                                strip.text.x = element_blank()) + ylab("Age (milliDiv)") +stat_compare_means(label =  "p.signif", label.x = 1.5)
 age_combined_plot <- age_combined_plot + ggtitle("Age Distribution of TEs")
 age_combined_plot
-ggsave(file="/storage2/jwlab/sandy/LocusMasterTE/paper/figure/age.pdf", plot=age_combined_plot, bg = 'white', width = 12, height = 8, units = 'cm', dpi = 600)
 
 ### Correlation Plot ###
 
