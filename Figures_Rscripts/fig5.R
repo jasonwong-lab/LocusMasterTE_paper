@@ -5,7 +5,7 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
                  axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 
 ## L1PA13 TCGA-COAD strata ##
-L1PA13_strata <- read.delim("https://figshare.com/ndownloader/files/44569091")
+L1PA13_strata <- read.delim("https://figshare.com/ndownloader/files/44622562")
 L1PA13_strata_mat <- data.frame(melt(cbind(name=rownames(L1PA13_strata), L1PA13_strata[,1:4])))
 L1PA13_strata_mat$strata <- unlist(L1PA13_strata[match(L1PA13_strata_mat$name, rownames(L1PA13_strata)),5])
 l1pa13 <- ggplot(L1PA13_strata_mat, aes(x=strata, y=value, fill=strata)) + geom_quasirandom()+ylab("log2(TPM)") + xlab("")+ ggtitle("L1PA13 Expression")+ geom_boxplot(width=0.2) + facet_wrap(~variable,scales="free_y")+My_Theme+scale_fill_jco()+ stat_compare_means(label =  "p.signif", label.x = 1.5)
@@ -53,19 +53,6 @@ GENE_log2TPM_far2p1 <- na.omit(GENE_log2TPM_far2p1)
 far2p1 <- ggplot(GENE_log2TPM_far2p1, aes(x=strata, y=value, fill=strata)) + geom_quasirandom()+ylab("log2 (TPM)") + xlab("") + ggtitle("FAR2P1 Expression")+ geom_boxplot(width=0.1) +My_Theme+scale_fill_jco()+ stat_compare_means(label =  "p.signif", label.x = 1.5)
 
 
-## using PRJNA787646 RNA-seq ##
-L1PA13_rmsk_indi_df <- read.delim("https://figshare.com/ndownloader/files/44569088")
-my_comparisons <- list(c("ERBB2","BRAF"),c("ERBB2","KRAS"),c("ERBB2","None"))
-mutation <- ggplot(L1PA13_rmsk_indi_df, aes(x=Mutation, y=log2TPM, fill=Mutation)) +ggtitle("Sum of 4 L1PA13 locus")+scale_x_discrete(guide = guide_axis(angle = 45))+ My_Theme + xlab("Mutation in") + ylab("log2(TPM)")+geom_quasirandom() + geom_boxplot(width=0.2, alpha=0.8) + scale_fill_igv()+stat_compare_means(comparisons=my_comparisons, label =  "p.signif", label.x = 1.5)
-
-## mutation in TCGA-COAD ##
-TCGA.COAD.cnv <- read.delim("https://figshare.com/ndownloader/files/44569082")
-#chr17:39687914-39730426 - ERBB2
-TCGA.COAD.cnv_erbb2 <- TCGA.COAD.cnv[TCGA.COAD.cnv$Chrom=="17",]
-TCGA.COAD.cnv_erbb2 <- TCGA.COAD.cnv_erbb2[TCGA.COAD.cnv_erbb2$Start<39687914 & TCGA.COAD.cnv_erbb2$End>39730426,]
-
-L1PA13_strata_mat$mut <- unlist(TCGA.COAD.cnv_erbb2[match(L1PA13_strata_mat$name,gsub("-",".", TCGA.COAD.cnv_erbb2$sample, fixed=TRUE)),5])
-L1PA13_strata_mat <- na.omit(L1PA13_strata_mat)
-
-tcga_mutation <- ggplot(L1PA13_strata_mat, aes(x=strata, y=mut, fill=strata)) +xlab("")+ylab("ERBB2 copy number")+scale_fill_jco()+ My_Theme + geom_quasirandom() + geom_boxplot(width=0.2) +stat_compare_means(comparisons=list(c("Strata1","Strata2")),label =  "p.signif")
-
+## Check other factors ##
+stage <- ggplot(L1PA13_strata, aes(x=strata, fill=stage)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_nejm()+theme(legend.position = "right")
+msi <- ggplot(L1PA13_strata, aes(x=strata, fill=MSI)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_ordinal()+theme(legend.position = "right")
