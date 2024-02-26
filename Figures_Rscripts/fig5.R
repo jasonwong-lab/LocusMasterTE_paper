@@ -54,8 +54,8 @@ far2p1 <- ggplot(GENE_log2TPM_far2p1, aes(x=strata, y=value, fill=strata)) + geo
 
 
 ## Check other factors ##
-stage <- ggplot(L1PA13_strata, aes(x=strata, fill=stage)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_nejm()+theme(legend.position = "right")
 L1PA13_strata$MSI[L1PA13_strata$MSI=="MSS" | L1PA13_strata$MSI=="MSI-L"] <- "MSS"
 L1PA13_strata$MSI[L1PA13_strata$MSI=="MSI-H"] <- "MSI"
 L1PA13_strata$MSI[L1PA13_strata$MSI=="none" | L1PA13_strata$MSI=="Indeterminate"] <- "Indeterminate"
-msi <- ggplot(L1PA13_strata, aes(x=strata, fill=MSI)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_ordinal()+theme(legend.position = "right")
+msi <- ggplot(L1PA13_strata, aes(x=strata, fill=MSI)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_nejm()+theme(legend.position = "right")
+stage <- ggplot(L1PA13_strata, aes(x=strata, fill=stage)) +  geom_bar(position = "fill", width=0.7) +scale_x_discrete(guide = guide_axis(angle = 45))+xlab("")+ylab("Proportion (%)")+scale_y_continuous(labels = scales::percent) + My_Theme + scale_fill_ordinal()+theme(legend.position = "right")
