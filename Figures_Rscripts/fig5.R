@@ -14,6 +14,9 @@ survival_four_raw <- read.delim("https://figshare.com/ndownloader/files/39038849
 survival_four_raw$sample <- gsub("-",".",survival_four_raw$sample, fixed=TRUE)
 survival_four_raw_nec <- survival_four_raw[survival_four_raw$sample %in% substr(L1PA13_strata_mat$name, 1, 15),]
 survival_four_raw_nec$group <- unlist(L1PA13_strata_mat[match(survival_four_raw_nec$sample, substr(L1PA13_strata_mat$name, 1, 15)),4])
+survival_four_raw_nec <- survival_four_raw_nec[,c(1,2,7,8,12)]
+survival_four_raw_nec <- na.omit(survival_four_raw_nec)
+survival_four_raw_nec$DFI.time <- survival_four_raw_nec$DFI.time/365
 
 ## Survival analysis ##
 library(survminer)
