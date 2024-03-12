@@ -6,17 +6,16 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
 
 ## L1PA13 TCGA-COAD strata ##
 L1PA13_strata <- read.delim("https://figshare.com/ndownloader/files/44622562")
-L1PA13_strata_mat <- data.frame(melt(cbind(name=rownames(L1PA13_strata), L1PA13_strata[,1:4])))
-L1PA13_strata_mat$strata <- unlist(L1PA13_strata[match(L1PA13_strata_mat$name, rownames(L1PA13_strata)),5])
-l1pa13 <- ggplot(L1PA13_strata_mat, aes(x=strata, y=value, fill=strata)) + geom_quasirandom()+ylab("log2(TPM)") + xlab("")+ ggtitle("L1PA13 Expression")+ geom_boxplot(width=0.2) + facet_wrap(~variable,scales="free_y")+My_Theme+scale_fill_jco()+ stat_compare_means(label =  "p.signif", label.x = 1.5)
+L1PA13_strata$sum <- rowSums(L1PA13_strata[,1:4])
+L1PA13_strata <- L1PA13_strata[,c(8,5,6,7)]
+L1PA13_strata$strata[L1PA13_strata$strata=="Strata1"] <- "Group 1"
+L1PA13_strata$strata[L1PA13_strata$strata=="Strata2"] <- "Group 2"
+l1pa13 <- ggplot(L1PA13_strata, aes(x=strata, y=sum, fill=strata)) + geom_quasirandom()+ylab("log2(TPM)") + xlab("")+ ggtitle("L1PA13 Expression")+ geom_boxplot(width=0.2)+My_Theme+scale_fill_jco()+ stat_compare_means(label =  "p.signif", label.x = 1.5)
 
 survival_four_raw <- read.delim("https://figshare.com/ndownloader/files/39038849")
 survival_four_raw$sample <- gsub("-",".",survival_four_raw$sample, fixed=TRUE)
 survival_four_raw_nec <- survival_four_raw[survival_four_raw$sample %in% substr(L1PA13_strata_mat$name, 1, 15),]
 survival_four_raw_nec$group <- unlist(L1PA13_strata_mat[match(survival_four_raw_nec$sample, substr(L1PA13_strata_mat$name, 1, 15)),4])
-survival_four_raw_nec <- survival_four_raw_nec[,c(1,2,7,8,12)]
-survival_four_raw_nec <- na.omit(survival_four_raw_nec)
-survival_four_raw_nec$DFI.time <- survival_four_raw_nec$DFI.time/365
 
 ## Survival analysis ##
 library(survminer)
