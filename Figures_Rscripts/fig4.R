@@ -46,8 +46,8 @@ intergenic_TE_gene_all
 
 
 ## ------3. Survival------ ##
-TCGA_COAD_TE_exp <- read.delim("https://figshare.com/ndownloader/files/44569130")
-locusmasterte_te <- read.table("https://figshare.com/ndownloader/files/44481584", quote="\"", comment.char="")
+TCGA_COAD_TE_exp <- read.delim("https://figshare.com/ndownloader/files/44483687")
+
 diff_TE <- read.delim("https://figshare.com/ndownloader/files/44481530", header=FALSE)
 only_mod_imp <- diff_TE[diff_TE$V5 == "intergenic",]
 
@@ -61,7 +61,8 @@ library(survival)
 survival_four_raw <- read.delim("https://figshare.com/ndownloader/files/44483729")
 survival_four_raw <- survival_four_raw[str_detect(survival_four_raw$sample,"-01"),]
 survival_four_raw$X_PATIENT <- gsub("-",".", survival_four_raw$X_PATIENT, fixed=TRUE)
-survival_four_raw <- survival_four_raw[survival_four_raw$OS.time != 0,]
+survival_four_raw <- survival_four_raw[,c(1,2,7,8)]
+survival_four_raw <- na.omit(survival_four_raw)
 TCGA_COAD_TE_exp_nec_no0 <- TCGA_COAD_TE_exp_nec_no0[,colnames(TCGA_COAD_TE_exp_nec_no0) %in% survival_four_raw$X_PATIENT]
 TCGA_COAD_TE_exp_nec_no0 <- data.frame(TCGA_COAD_TE_exp_nec_no0)
 
@@ -73,22 +74,22 @@ survival_four_raw <- survival_four_raw[survival_four_raw$X_PATIENT %in% colnames
 for(i in 1:nrow(TCGA_COAD_TE_exp_nec_no0)){
   survival_four_raw <- cbind(survival_four_raw, name = unlist(TCGA_COAD_TE_exp_nec_no0[i,match(survival_four_raw$X_PATIENT,colnames(TCGA_COAD_TE_exp_nec_no0))]))
 }
-colnames(survival_four_raw)[12:ncol(survival_four_raw)] <- rownames(TCGA_COAD_TE_exp_nec_no0)
+colnames(survival_four_raw)[5:ncol(survival_four_raw)] <- rownames(TCGA_COAD_TE_exp_nec_no0)
 
-survival_four_raw <- survival_four_raw[survival_four_raw$PFI.time > 0,]
+survival_four_raw <- survival_four_raw[survival_four_raw$DFI.time > 0,]
 
-te <- survival_four_raw[,12:ncol(survival_four_raw)]
+te <- survival_four_raw[,5:ncol(survival_four_raw)]
 te <- as.matrix(sapply(te, as.numeric))  
 
 ## save memory
 TCGA_COAD_TE_exp <- NULL
 
-### Look at PFI ###
-## PFI ##
-# "AluSx_44769"  "AluSp_29088"  "AluSg_30598"  "AluY_88947"   "AluY_91831"   "L1MC4a_10165"
+### Look at DFI ###
+## DFI ##
+# "AluSq2_20144" "L1PA3_8098"   "AluSx_89751"  "AluYc_3851"
 for(i in c(1:100)){
   cv.fit2 = cv.glmnet(te,
-                      Surv(survival_four_raw$PFI.time, survival_four_raw$PFI),
+                      Surv(survival_four_raw$DFI.time, survival_four_raw$DFI),
                       alpha = 1,
                       family = "cox")
   small.lambda.index <- which(cv.fit2$lambda == cv.fit2$lambda.min)
@@ -100,7 +101,7 @@ for(i in c(1:100)){
 
 
 ### Selected TE
-tot <- c("AluSx_44769","AluSp_29088","AluSg_30598","AluY_88947","AluY_91831","L1MC4a_10165")
+tot <- c("AluSq2_20144","L1PA3_8098","AluSx_89751","AluYc_3851")
 ### find optimal clusters ###
 library(ConsensusClusterPlus)
 TCGA_COAD_TE_extract <- TCGA_COAD_TE_exp_nec_no0[rownames(TCGA_COAD_TE_exp_nec_no0) %in% tot,]
@@ -109,12 +110,12 @@ TCGA_COAD_TE_extract <- data.matrix(TCGA_COAD_TE_extract)
 
 results = ConsensusClusterPlus(TCGA_COAD_TE_extract,maxK=10,reps=100,pFeature=1,distance="euclidean",clusterAlg="pam",plot="pdf")
 
-temp <- data.frame(results[[2]]$consensusClass)
+temp <- data.frame(results[[3]]$consensusClass)
 survival_four <- survival_four_raw[,c(1:10)]
 survival_four$TE_group <- unlist(temp[match(survival_four$X_PATIENT,rownames(temp)),1])
-
-## PFI ##
-fit <- survfit(Surv(PFI.time, PFI) ~ TE_group, data = survival_four)
+survival_four$DFI.time <- survival_four$DFI.time/365
+## DFI ##
+fit <- survfit(Surv(DFI.time, DFI) ~ TE_group, data = survival_four)
 
 library(survminer)
 ggsurvplot(fit,
@@ -122,8 +123,8 @@ ggsurvplot(fit,
            risk.table = TRUE,
            risk.table.col = "strata",
            linetype = "strata",
-           palette = c("#DC0000FF", "#3C5488FF"),
-           ggtheme = My_Theme,xlab = "PFI(time)")
+           palette = c("#DC0000FF", "#3C5488FF","#00A087FF"),
+           ggtheme = My_Theme,xlab = "DFI (Year)")
 
 TCGA_COAD_TE_extract <- TCGA_COAD_TE_exp_nec_no0[rownames(TCGA_COAD_TE_exp_nec_no0) %in% tot,]
 box_plot <- melt(cbind("name"=rownames(TCGA_COAD_TE_extract),TCGA_COAD_TE_extract))
@@ -131,13 +132,14 @@ box_plot <- melt(cbind("name"=rownames(TCGA_COAD_TE_extract),TCGA_COAD_TE_extrac
 box_plot$strata <- paste0("strata",unlist(temp[match(box_plot$variable,rownames(temp)),1]))
 box_plot <- na.omit(box_plot)
 
-box_plot$strata[box_plot$strata == "strata1"] <- "Poor"
-box_plot$strata[box_plot$strata == "strata2"] <- "Good"
+box_plot$strata[box_plot$strata == "strata1"] <- "Group 1"
+box_plot$strata[box_plot$strata == "strata2"] <- "Group 2"
+box_plot$strata[box_plot$strata == "strata3"] <- "Group 3"
 
 box_plot <- box_plot[box_plot$value>0,]
-surv_box <- ggplot(box_plot, aes(x=strata, y=value, fill=strata)) + geom_quasirandom(alpha=0.5)+geom_boxplot(width=0.2, lwd=1) +scale_fill_manual(values=c("#3C5488FF", "#DC0000FF"))
-surv_box <- surv_box + facet_wrap(~name,scales="free", ncol=3)
-surv_box <- surv_box+ xlab("Survival Strata")+ylab("TE expression")+My_Theme
+surv_box <- ggplot(box_plot, aes(x=strata, y=value, fill=strata)) +theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ geom_quasirandom(alpha=0.5)+geom_boxplot(width=0.2, lwd=1) +scale_fill_manual(values=c("#3C5488FF", "#DC0000FF","#00A087FF"))
+surv_box <- surv_box + facet_wrap(~name,scales="free_y", ncol=2)
+surv_box <- surv_box+ xlab("Survival Groups")+ylab("TE expression")+My_Theme
 
 ## 4------. Mutational Signature------ ##
 library(MutationalPatterns)
