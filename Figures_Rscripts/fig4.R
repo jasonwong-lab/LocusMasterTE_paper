@@ -1,175 +1,185 @@
-library(reshape)
+library(tidyverse)
+library(ggpubr)
+library(ggpointdensity)
+
 My_Theme = theme(legend.text = element_text(size=10), legend.title = element_blank(),legend.position="bottom",plot.title = element_text(hjust = 0.5, colour = "black", size = 10),
                  axis.title.x = element_text(colour = "black", size = 10),
                  axis.text.x = element_text(colour = "black",size = 10),
                  axis.title.y = element_text(colour = "black",size = 10),axis.text.y = element_text(colour = "black",size = 10),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(),axis.line = element_line(colour = "black"))
 
-## ------1. GSVA Graph------ ##
+## --- Cell Line --- ##
 
-### compare correlation between DNA RNA sensing and TE
-DNA_RNA_gene_TE_cor_GSVA_mod <- read.delim("https://figshare.com/ndownloader/files/44481905")
-DNA_RNA_gene_TE_cor_GSVA_org <- read.delim("https://figshare.com/ndownloader/files/44481881")
-DNA_RNA_gene_TE_cor_GSVA_org$label <- "Telescope"
-DNA_RNA_gene_TE_cor_GSVA_mod$label <- "LocusMasterTE"
+### 1. Age Analysis ###
+combined_dataset_ERR6937788 <- read.delim("https://figshare.com/ndownloader/files/44176907", comment.char="#")
+combined_dataset_ERR6937791 <- read.delim("https://figshare.com/ndownloader/files/44176916", comment.char="#")
+combined_dataset_ERR6937794 <- read.delim("https://figshare.com/ndownloader/files/44176913", comment.char="#")
+combined_dataset_ERR6937797 <- read.delim("https://figshare.com/ndownloader/files/44176919", comment.char="#")
+combined_dataset_ERR6937800 <- read.delim("https://figshare.com/ndownloader/files/44176922", comment.char="#")
+combined_dataset_HCT116 <- read.delim("https://figshare.com/ndownloader/files/44176910", comment.char="#")
 
-DNA_RNA_gene_TE_cor_GSVA_org$mod <- unlist(DNA_RNA_gene_TE_cor_GSVA_mod[match(DNA_RNA_gene_TE_cor_GSVA_org$name, DNA_RNA_gene_TE_cor_GSVA_mod$name),3])
-p_cor <- ggplot(DNA_RNA_gene_TE_cor_GSVA_org, aes(x = abs(R_value), y=abs(mod))) + geom_point(shape=1, size=2, color="#00A087FF")+geom_abline(slope=1, linewidth =1,linetype = 'dashed', color = "#7E6148FF")
-p_cor <- p_cor + My_Theme + xlab("abs(cor.value) by Telescope")+ylab("abs(cor.value) by LocusMasterTE") + ggtitle("Cor.value of TE with GSVA score \n for DNA/RNA sensing gene")
-
-## ------2. Correlation Test------ ##
-
-## Intergenic TEs with 5kb regions
-intergenic_TE_gene <- read.delim("https://figshare.com/ndownloader/files/44481866")
-
-intergenic_TE_gene$diff <- abs(as.numeric(intergenic_TE_gene$LocusMasterTE_cor)) - abs(as.numeric(intergenic_TE_gene$Telescope_cor))
-
-intergenic_TE_gene$group <- "abs(<0.5)"
-intergenic_TE_gene$group[abs(intergenic_TE_gene$LocusMasterTE_cor) >= 0.5 | abs(intergenic_TE_gene$Telescope_cor) >= 0.5] <- "abs(>=0.5) in either"
-intergenic_TE_gene$high <- "Same"
-intergenic_TE_gene$high[intergenic_TE_gene$diff > 0.01] <- "high in Our"
-intergenic_TE_gene$high[intergenic_TE_gene$diff < -0.01] <- "high in Telescope"
-
-intergenic_TE_gene$color_label <- "1Others"
-intergenic_TE_gene$color_label[intergenic_TE_gene$group == "abs(>=0.5) in either" & intergenic_TE_gene$high=="high in Our"] <- "3abs(>=0.5) & \nhigh in LocusMasterTE"
-intergenic_TE_gene$color_label[intergenic_TE_gene$group == "abs(>=0.5) in either" & intergenic_TE_gene$high=="high in Telescope"] <- "2abs(>=0.5) & \nhigh in Telescope"
-
-p_cor_5kb_all <- ggplot(intergenic_TE_gene, aes(x = abs(Telescope_cor), y=abs(LocusMasterTE_cor),color=color_label)) +  geom_pointdensity(alpha=0.8) +geom_abline(slope=1, linewidth =1,linetype = 'dashed', color = "#7E6148FF")
-p_cor_5kb_all <- p_cor_5kb_all + My_Theme + xlab("abs(cor.value) by Telescope")+ylab("abs(cor.value) by LocusMasterTE") + ggtitle("Cor.value of intergenic TE +/- 5kb \nwith coding genes") + theme(legend.position = "none")
-p_cor_5kb_all <- p_cor_5kb_all + scale_colour_manual(values = c("grey", "#3C5488FF", "#DC0000FF"))+scale_fill_discrete(labels=c('Others', 'abs(>=0.5) & \nhigh in Telescope', 'abs(>=0.5) & \nhigh in LocusMasterTE'))
-
-intergenic_TE_gene_all <- intergenic_TE_gene %>% dplyr::group_by(group, high) %>% dplyr::summarise(Freq=n())
-intergenic_TE_gene_all <- intergenic_TE_gene_all[intergenic_TE_gene_all$high != "Same",]
-intergenic_TE_gene_all <- cast(intergenic_TE_gene_all, group~high) 
-
-chisq.test(intergenic_TE_gene_all)
-intergenic_TE_gene_all
-
-
-## ------3. Survival------ ##
-TCGA_COAD_TE_exp <- read.delim("https://figshare.com/ndownloader/files/44483687")
-
-diff_TE <- read.delim("https://figshare.com/ndownloader/files/44481530", header=FALSE)
-only_mod_imp <- diff_TE[diff_TE$V5 == "intergenic",]
-
-TCGA_COAD_TE_exp_nec_no0 <- TCGA_COAD_TE_exp[rownames(TCGA_COAD_TE_exp) %in% only_mod_imp$V4,]
-TCGA_COAD_TE_exp_nec_no0 <- TCGA_COAD_TE_exp_nec_no0[,str_detect(colnames(TCGA_COAD_TE_exp_nec_no0),"01A")]
-colnames(TCGA_COAD_TE_exp_nec_no0) <- substr(colnames(TCGA_COAD_TE_exp_nec_no0),1,12)
-
-### run Lasso-cox regression model ###
-library(glmnet)
-library(survival)
-survival_four_raw <- read.delim("https://figshare.com/ndownloader/files/44483729")
-survival_four_raw <- survival_four_raw[str_detect(survival_four_raw$sample,"-01"),]
-survival_four_raw$X_PATIENT <- gsub("-",".", survival_four_raw$X_PATIENT, fixed=TRUE)
-survival_four_raw <- survival_four_raw[,c(1,2,7,8)]
-survival_four_raw <- na.omit(survival_four_raw)
-TCGA_COAD_TE_exp_nec_no0 <- TCGA_COAD_TE_exp_nec_no0[,colnames(TCGA_COAD_TE_exp_nec_no0) %in% survival_four_raw$X_PATIENT]
-TCGA_COAD_TE_exp_nec_no0 <- data.frame(TCGA_COAD_TE_exp_nec_no0)
-
-## only select TE with 80% expressed
-threshold <- ncol(TCGA_COAD_TE_exp_nec_no0) * 0.8
-TCGA_COAD_TE_exp_nec_no0 <- TCGA_COAD_TE_exp_nec_no0[rowSums(TCGA_COAD_TE_exp_nec_no0 == 0) <= threshold, ]
-
-survival_four_raw <- survival_four_raw[survival_four_raw$X_PATIENT %in% colnames(TCGA_COAD_TE_exp_nec_no0),]
-for(i in 1:nrow(TCGA_COAD_TE_exp_nec_no0)){
-  survival_four_raw <- cbind(survival_four_raw, name = unlist(TCGA_COAD_TE_exp_nec_no0[i,match(survival_four_raw$X_PATIENT,colnames(TCGA_COAD_TE_exp_nec_no0))]))
-}
-colnames(survival_four_raw)[5:ncol(survival_four_raw)] <- rownames(TCGA_COAD_TE_exp_nec_no0)
-
-survival_four_raw <- survival_four_raw[survival_four_raw$DFI.time > 0,]
-
-te <- survival_four_raw[,5:ncol(survival_four_raw)]
-te <- as.matrix(sapply(te, as.numeric))  
-
-## save memory
-TCGA_COAD_TE_exp <- NULL
-
-### Look at DFI ###
-## DFI ##
-# "AluSq2_20144" "L1PA3_8098"   "AluSx_89751"  "AluYc_3851"
-for(i in c(1:100)){
-  cv.fit2 = cv.glmnet(te,
-                      Surv(survival_four_raw$DFI.time, survival_four_raw$DFI),
-                      alpha = 1,
-                      family = "cox")
-  small.lambda.index <- which(cv.fit2$lambda == cv.fit2$lambda.min)
-  small.lambda.betas <- cv.fit2$glmnet.fit$beta[,small.lambda.index]
-  small.lambda.betas <- data.frame(small.lambda.betas)
-  small.lambda.betas <- rownames(small.lambda.betas)[small.lambda.betas$small.lambda.betas !=0]
-  print(small.lambda.betas)
+age_process <- function(combined_age){
+  combined_age <- combined_age[which((combined_age$Telescope != 0 | combined_age$LocusMasterTE != 0) & combined_age$long !=0),]
+  combined_age$diff_raw <- as.numeric(combined_age$Telescope) - as.numeric(combined_age$LocusMasterTE)
+  combined_age$corrected_by_modified_telescope <- "not captured"
+  combined_age$corrected_by_modified_telescope[which(combined_age$diff_raw != 0)] <- "captured"
+  combined_age$originally_correct <- "not captured"
+  combined_age$originally_correct[which(combined_age$diff_raw == 0)] <- "captured"
+  combined_age <- combined_age[,c(2,7,8)]
+  colnames(combined_age)[2] <- "TEs Corrected by LocusMasterTE"
+  colnames(combined_age)[3] <- "TEs Originally Correct"
+  combined_age <- melt(combined_age,id = "label")
+  combined_age <- combined_age[which(combined_age$value != 0 & combined_age$value != "not captured"),]
+  return(combined_age)
 }
 
+combined_dataset_ERR6937788_age <- age_process(combined_dataset_ERR6937788)
+combined_dataset_ERR6937791_age <- age_process(combined_dataset_ERR6937791)
+combined_dataset_ERR6937794_age <- age_process(combined_dataset_ERR6937794)
+combined_dataset_ERR6937797_age <- age_process(combined_dataset_ERR6937797)
+combined_dataset_ERR6937800_age <- age_process(combined_dataset_ERR6937800)
+combined_dataset_HCT116_age <- age_process(combined_dataset_HCT116)
+combined_dataset_ERR6937788_age <- cbind("group"=rep("SG-NEX A549"), combined_dataset_ERR6937788_age)
+combined_dataset_ERR6937791_age <- cbind("group"=rep("SG-NEX HepG2"), combined_dataset_ERR6937791_age)
+combined_dataset_ERR6937794_age <- cbind("group"=rep("SG-NEX HCT116"), combined_dataset_ERR6937794_age)
+combined_dataset_ERR6937797_age <- cbind("group"=rep("SG-NEX K562"), combined_dataset_ERR6937797_age)
+combined_dataset_ERR6937800_age <- cbind("group"=rep("SG-NEX MCF-7"), combined_dataset_ERR6937800_age)
+combined_dataset_HCT116_age <- cbind("group"=rep("Own HCT116"), combined_dataset_HCT116_age)
 
-### Selected TE
-tot <- c("AluSq2_20144","L1PA3_8098","AluSx_89751","AluYc_3851")
-### find optimal clusters ###
-library(ConsensusClusterPlus)
-TCGA_COAD_TE_extract <- TCGA_COAD_TE_exp_nec_no0[rownames(TCGA_COAD_TE_exp_nec_no0) %in% tot,]
-TCGA_COAD_TE_extract = sweep(TCGA_COAD_TE_extract,1, apply(TCGA_COAD_TE_extract,1,mean,na.rm=T))
-TCGA_COAD_TE_extract <- data.matrix(TCGA_COAD_TE_extract)
+age_combined <- rbind(combined_dataset_ERR6937788_age,combined_dataset_ERR6937791_age)
+age_combined <- rbind(age_combined,combined_dataset_ERR6937794_age)
+age_combined <- rbind(age_combined,combined_dataset_ERR6937797_age)
+age_combined <- rbind(age_combined,combined_dataset_ERR6937800_age)
+age_combined <- rbind(age_combined,combined_dataset_HCT116_age)
 
-results = ConsensusClusterPlus(TCGA_COAD_TE_extract,maxK=10,reps=100,pFeature=1,distance="euclidean",clusterAlg="pam",plot="pdf")
+hg38_repeatmasker <- read.delim("https://figshare.com/ndownloader/files/39038723", header=FALSE, comment.char="#")
+hg38_repeatmasker$V7 <- hg38_repeatmasker$V7+1
+hg38_repeatmasker$label <- paste(hg38_repeatmasker$V6, paste(hg38_repeatmasker$V7, hg38_repeatmasker$V8, sep="|"), sep="|")
+age_combined$age <- unlist(hg38_repeatmasker[match(age_combined$label, hg38_repeatmasker$label),3])
 
-temp <- data.frame(results[[3]]$consensusClass)
-survival_four <- survival_four_raw[,c(1:10)]
-survival_four$TE_group <- unlist(temp[match(survival_four$X_PATIENT,rownames(temp)),1])
-survival_four$DFI.time <- survival_four$DFI.time/365
-## DFI ##
-fit <- survfit(Surv(DFI.time, DFI) ~ TE_group, data = survival_four)
+age_combined <- na.omit(age_combined)
+age_combined[is.na(age_combined)] <- 0
+stats <- compare_means(millidiv ~ variable, group.by = "group", data = age_combined, method = "t.test")
+give.n <- age_combined %>% dplyr::group_by(group, variable) %>% dplyr::summarise(Freq=n())
 
-library(survminer)
-ggsurvplot(fit,
-           pval = TRUE,
-           risk.table = TRUE,
-           risk.table.col = "strata",
-           linetype = "strata",
-           palette = c("#DC0000FF", "#3C5488FF","#00A087FF"),
-           ggtheme = My_Theme,xlab = "DFI (Year)")
+age_combined_plot <- ggplot(age_combined, aes(x=variable, y=age, fill=variable)) + geom_boxplot(width=0.6, lwd=1)+facet_wrap(~group,nrow = 1)
+age_combined_plot <- age_combined_plot + My_Theme + scale_fill_npg() + scale_y_continuous(limits=c(0,350))
+age_combined_plot <- age_combined_plot + theme(axis.title.x=element_blank(),
+                                               axis.text.x=element_blank(),
+                                               axis.ticks.x=element_blank(),strip.background = element_blank(),
+                                               strip.text.x = element_blank()) + ylab("Age (milliDiv)") +stat_compare_means(label =  "p.signif", label.x = 1.5)
+age_combined_plot <- age_combined_plot + ggtitle("Age Distribution of TEs")
+age_combined_plot
 
-TCGA_COAD_TE_extract <- TCGA_COAD_TE_exp_nec_no0[rownames(TCGA_COAD_TE_exp_nec_no0) %in% tot,]
-box_plot <- melt(cbind("name"=rownames(TCGA_COAD_TE_extract),TCGA_COAD_TE_extract))
+### Correlation Plot ###
 
-box_plot$strata <- paste0("strata",unlist(temp[match(box_plot$variable,rownames(temp)),1]))
-box_plot <- na.omit(box_plot)
+library(corrplot)
+cell_line_name <- "own_Hct116"
+combined_dataset <- combined_dataset_HCT116
 
-box_plot$strata[box_plot$strata == "strata1"] <- "Group 1"
-box_plot$strata[box_plot$strata == "strata2"] <- "Group 2"
-box_plot$strata[box_plot$strata == "strata3"] <- "Group 3"
+cell_line_name <- "A549"
+combined_dataset <- combined_dataset_ERR6937788
 
-box_plot <- box_plot[box_plot$value>0,]
-surv_box <- ggplot(box_plot, aes(x=strata, y=value, fill=strata)) +theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))+ geom_quasirandom(alpha=0.5)+geom_boxplot(width=0.2, lwd=1) +scale_fill_manual(values=c("#3C5488FF", "#DC0000FF","#00A087FF"))
-surv_box <- surv_box + facet_wrap(~name,scales="free_y", ncol=2)
-surv_box <- surv_box+ xlab("Survival Groups")+ylab("TE expression")+My_Theme
+cell_line_name <- "HepG2"
+combined_dataset <- combined_dataset_ERR6937791
 
-## 4------. Mutational Signature------ ##
-library(MutationalPatterns)
-library(BSgenome)
-ref_genome <- "BSgenome.Hsapiens.UCSC.hg38"
-library(ref_genome, character.only = TRUE)
-library(gridExtra)
-library(lsa)
+cell_line_name <- "Hct116"
+combined_dataset <- combined_dataset_ERR6937794
 
-mut_mat <- read.delim("https://figshare.com/ndownloader/files/44481518")
-mut_mat$average_common <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "common")])
-mut_mat$average_lasTEq <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "mod")])
-mut_mat$average_coding_gene <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "coding_gene")])
+cell_line_name <- "K562"
+combined_dataset <- combined_dataset_ERR6937797
 
-colnames(mut_mat)[c(1,(ncol(mut_mat)-2):ncol(mut_mat))] <- c("Reference","common\nTEs", "LocusMaster\nTE only", "Coding\nGenes")
-plot_96_profile(mut_mat[,c(1,2,3)])/plot_96_profile(mut_mat[,c((ncol(mut_mat)-2):ncol(mut_mat))], ymax = 0.1)
+cell_line_name <- "MCF7"
+combined_dataset <- combined_dataset_ERR6937800
 
-mut_mat <- mut_mat[,1:(ncol(mut_mat)-3)]
 
-mut_mat <- rbind("cosine" = rep(0),mut_mat)
-for(i in 1:ncol(mut_mat)){
-  mut_mat[1,i] <- cosine(mut_mat$Reference, mut_mat[,i])
+correlation <- function(combined_dataset,cell_line_name, short, long){
+  combined_dataset_cor <- combined_dataset
+  combined_dataset_cor$str <- unlist(sapply(strsplit(combined_dataset_cor$label,"|", fixed = TRUE), function(x) x[2], simplify=FALSE))
+  combined_dataset_cor$end <- unlist(sapply(strsplit(combined_dataset_cor$label,"|", fixed = TRUE), function(x) x[3], simplify=FALSE))
+  combined_dataset_cor$length <- as.numeric(combined_dataset_cor$end) - as.numeric(combined_dataset_cor$str)+1
+  
+  combined_dataset_cor$LocusMasterTE <- round(combined_dataset_cor$LocusMasterTE)
+  
+  ### change to TPM ### use sum of coding genes as library size
+  long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/44176547", comment.char="#")
+  short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/44176556", comment.char="#")
+  short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup[,7]) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
+  long_read_fc_coding_gene_cleanup$rate <- as.numeric(long_read_fc_coding_gene_cleanup[,7]) / as.numeric(long_read_fc_coding_gene_cleanup$Length)
+  
+  library_size_short = sum(short_read_fc_coding_gene_cleanup$rate)
+  library_size_long = sum(long_read_fc_coding_gene_cleanup$rate)
+  
+  tpm3 <- function(counts,len) {
+    x <- as.numeric(counts)/as.numeric(len)
+    return(t(t(x)*1e6))
+  }
+  
+  combined_dataset_cor$longTPM <- (tpm3(as.numeric(combined_dataset_cor$long), as.numeric(combined_dataset_cor$length)))/library_size_long
+  combined_dataset_cor$shortTPM <- (tpm3(as.numeric(combined_dataset_cor$Telescope), as.numeric(combined_dataset_cor$length)))/library_size_short
+  combined_dataset_cor$LocusMasterTETPM <- (tpm3(as.numeric(combined_dataset_cor$LocusMasterTE), as.numeric(combined_dataset_cor$length)))/library_size_short
+  
+  combined_dataset_cor$diff <- as.numeric(combined_dataset_cor$shortTPM) - as.numeric(combined_dataset_cor$LocusMasterTETPM)
+  combined_dataset_cor$diff_label <- "Same"
+  combined_dataset_cor[which(combined_dataset_cor$diff != 0),"diff_label"] <- "Changed"
+  combined_dataset_cor_common <- combined_dataset_cor[which(abs(combined_dataset_cor$diff)> 1e-5),]
+  combined_dataset_cor_common <- combined_dataset_cor_common[,c(1,9:11)]
+  combined_dataset_cor_common <- na.omit(combined_dataset_cor_common)
+  rownames(combined_dataset_cor_common) <- combined_dataset_cor_common[,1]
+  combined_dataset_cor_common <- combined_dataset_cor_common[rowSums(combined_dataset_cor_common[,2:4])>0,]
+  combined_dataset_cor_common <- combined_dataset_cor_common[,2:4]
+  
+  combined_dataset_cor_common <- combined_dataset_cor_common[!(apply(combined_dataset_cor_common, 1, function(y) any(y == 0))),]
+  for(i in 1:ncol(combined_dataset_cor_common)){
+    combined_dataset_cor_common[,i] <- as.numeric(log(combined_dataset_cor_common[,i]+1e-5, base=10))
+  }
+  p1 <- ggscatter(combined_dataset_cor_common[,c(1,2)], y = "longTPM", x = "shortTPM",
+                  add = "reg.line", color = "#7E6148B2",
+                  add.params = list(color = "#3C5488B2", fill = "#8491B4B2", size=4),
+                  conf.int = TRUE)+My_Theme
+  p1 <- p1 + stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),size = 4)
+  p1 <- p1 + ggtitle("Telescope") + xlab("log10 (TPM by Telescope)") + ylab("log10 (TPM by Long Read)")
+  
+  
+  p2 <- ggscatter(combined_dataset_cor_common[,c(1,3)], y = "longTPM", x = "LocusMasterTETPM",
+                  add = "reg.line", color = "#7E6148B2",
+                  add.params = list(color = "#DC0000FF", fill = "#8491B4B2", size=4),
+                  conf.int = TRUE)+My_Theme
+  p2 <- p2 + stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),size = 4)
+  p2 <- p2 + ggtitle("LocusMasterTE") + xlab("log10 (TPM by LocusMasterTE)") + ylab("log10 (TPM by Long Read)")
+  
 }
 
-## box-plot
-mut_mat_graph <- mut_mat[1,2:ncol(mut_mat)]
-mut_mat_graph <- melt(cbind(rownames(mut_mat_graph),mut_mat_graph))
-mut_mat_graph$label <- "coding_genes"
-mut_mat_graph$label[str_detect(mut_mat_graph$variable,"common")] <- "common"
-mut_mat_graph$label[str_detect(mut_mat_graph$variable,"mod")] <- "LocusMasterTE only"
+### 3. Correlation Bubble Plot ###
 
-p3_box <- ggplot(mut_mat_graph, aes(x=label, y=value, fill=label)) + geom_quasirandom(alpha=0.7,color = "#B09C85FF") +scale_fill_npg() + geom_boxplot(width=0.2, lwd=1)
-p3_box <- p3_box + xlab("") + ylab("Cosine")+My_Theme
+### heatmap for correlation
+cor_df <- data.frame(rep(0, 2))
+for(i in 1:5){
+  cor_df <- cbind(cor_df, rep(0,2))
+}
+colnames(cor_df) <- c("inhouse","A549","HCT116","HepG2","K562","MCF-7")
+rownames(cor_df) <- c("Telescope","LocusMasterTE")
+cor_df[1,] <- c(0.5,0.51, 0.48,0.44,0.39,0.55)
+cor_df[2,] <- c(0.54,0.55, 0.56,0.48,0.43,0.58)
+cor_df <- cbind("label"=rownames(cor_df),cor_df)
+cor_df$label <- factor(cor_df$label, levels=c("Telescope", "LocusMasterTE"))
+cor_df <- cor_df[,c(1,3:7)]
+cor_df <- melt(cor_df)
+cor_df$log_value <- log10(cor_df$value)+10
+cor_df_heatmap <- ggplot(cor_df, aes(x =label, y = variable, color=label,size=log_value)) +geom_point()+scale_size(range = c(9,15))
+cor_df_heatmap <- cor_df_heatmap + My_Theme
+cor_df_heatmap <- cor_df_heatmap + theme(strip.background = element_blank(), strip.text.y = element_blank(),axis.title.x=element_blank(),axis.title.y=element_blank(),legend.position="bottom")
+cor_df_heatmap <- cor_df_heatmap + scale_color_manual(values=c("#3C5488FF","#DC0000FF"))+geom_text(aes(label=value), size=4, color="white",fontface = "bold")
+cor_df_heatmap <- cor_df_heatmap + ggtitle("Correlation with Long Read")+theme(legend.position="none")
+
+### 4. Histone bed file ###
+### bed file extraction for histone one example ###
+
+histone_own <- combined_dataset_ERR6937800[,c(1,2,4,5)]
+histone_own$diff <- histone_own$LocusMasterTE - histone_own$Telescope
+histone_own$label_diff <- "same"
+histone_own$label_diff[histone_own$diff > 1] <- "high_mixed"
+histone_own$label_diff[histone_own$diff < -1] <- "high_short"
+histone_own$chr <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), function(x) x[1], simplify=FALSE))
+histone_own$str <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), function(x) x[2], simplify=FALSE))
+histone_own$end <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), function(x) x[3], simplify=FALSE))
+
