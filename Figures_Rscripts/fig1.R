@@ -75,10 +75,6 @@ p <- ggvenn(long_short_gg,stroke_size = 0.5, set_name_size=4, text_size = 4) +sc
 long_short_gg_subf <- list("Long Read" = c(combined_short_long_subF$subF[combined_short_long_subF$long_read_subF != 0]), "Short Read" = c(combined_short_long_subF$subF[combined_short_long_subF$short_read_subF != 0]))
 p_subF <- ggvenn(long_short_gg_subf,stroke_size = 0.5, set_name_size=4, text_size = 4) +scale_fill_npg()
 
-## coding genes
-long_short_gg_cd <- list("Long Read" = c(long_read_fc_coding_gene_cleanup$Geneid[long_read_fc_coding_gene_cleanup[,7] != 0]), " Short Read" = c(short_read_fc_coding_gene_cleanup$Geneid[short_read_fc_coding_gene_cleanup[,7] != 0]))
-p_cd <- ggvenn(long_short_gg_cd,stroke_size = 0.5, set_name_size=4, text_size = 4) +scale_fill_npg()
-
 ### 2. Correlation Plot ###
 
 ## indi --> 5.5 6.5 plot ## - log(only captured one)
@@ -105,31 +101,6 @@ combined_short_long_cor_graph_common <- combined_short_long_cor_graph_common + s
 combined_short_long_cor_graph_common <- combined_short_long_cor_graph_common + geom_smooth(method='lm', formula= y~x, color="#3C5488B2", size=4)
 combined_short_long_cor_graph_common <- combined_short_long_cor_graph_common + xlab("Long Read at Subfamily (log10 TPM)") + ylab("Short Read at Subfamily (log10 TPM)")+My_Theme
 
-## coding genes --> 5.5 6.5 plot ## - log(only captured one)
-combined_short_long_cd <- long_read_fc_coding_gene_cleanup[,c(1,7)]
-colnames(combined_short_long_cd)[2] <- "long_read_coding_genes"
-combined_short_long_cd$short_read_coding_genes <- unlist(short_read_fc_coding_gene_cleanup[match(combined_short_long_cd$Geneid,short_read_fc_coding_gene_cleanup$Geneid),7])
-
-combined_short_long_cd <- na.omit(combined_short_long_cd)
-combined_short_long_cor_cd <- combined_short_long_cd[,2:3]
-rownames(combined_short_long_cor_cd) <- combined_short_long_cd[,1]
-combined_short_long_cor_cd <- combined_short_long_cor_cd[!(apply(combined_short_long_cor_cd, 1, function(y) any(y == 0))),]
-
-short_read_fc_coding_gene_cleanup_nec <- short_read_fc_coding_gene_cleanup[short_read_fc_coding_gene_cleanup$Geneid %in% rownames(combined_short_long_cor_cd),]
-long_read_fc_coding_gene_cleanup_nec <- long_read_fc_coding_gene_cleanup[long_read_fc_coding_gene_cleanup$Geneid %in% rownames(combined_short_long_cor_cd),]
-
-
-combined_short_long_cor_cd$short_TPM <- (tpm3(as.numeric(combined_short_long_cor_cd$short_read_coding_genes), as.numeric(short_read_fc_coding_gene_cleanup_nec$Length)))/library_size_short
-combined_short_long_cor_cd$long_TPM <- (tpm3(as.numeric(combined_short_long_cor_cd$long_read_coding_genes), as.numeric(long_read_fc_coding_gene_cleanup_nec$Length)))/library_size_long
-
-combined_short_long_cor_cd$short_TPM_log <- log(combined_short_long_cor_cd$short_TPM+1e-7, base=10)
-combined_short_long_cor_cd$long_TPM_log <- log(combined_short_long_cor_cd$long_TPM+1e-7, base=10)
-combined_short_long_cor_cd <- combined_short_long_cor_cd[,c(6,5)]
-combined_short_long_cor_graph_cd_common <- ggplot(combined_short_long_cor_cd, aes(x=long_TPM_log,y=short_TPM_log)) + geom_pointdensity(color = "#7E6148B2")
-combined_short_long_cor_graph_cd_common <- combined_short_long_cor_graph_cd_common + stat_cor(aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~")),size = 4)
-combined_short_long_cor_graph_cd_common <- combined_short_long_cor_graph_cd_common + geom_smooth(method='lm', formula= y~x, color="#3C5488B2", size=4)
-combined_short_long_cor_graph_cd_common <- combined_short_long_cor_graph_cd_common + xlab("Long Read Coding Genes (log10 TPM)") + ylab("Short Read Coding Genes (log10 TPM)")+My_Theme
-
 ### ---- Figure1-E ---- ###
 ### Age Histogram ###
 combined_short_long <- na.omit(combined_short_long)
@@ -143,12 +114,12 @@ colnames(combined_short_long_age)[2:5] <- c("Long","Short", "Only in\nLong","Onl
 combined_short_long_age <- melt(combined_short_long_age)
 combined_short_long_age <- combined_short_long_age[combined_short_long_age$value !=0,]
 combined_short_long_age$milidiv <- hg38_repeatmasker[match(combined_short_long_age$label,hg38_repeatmasker$label),3]
-
+combined_short_long_age$milidiv <- combined_short_long_age$milidiv*0.1
 my_comparisons <- list(c("Long", "Short"), c("Only in\nLong", "Only in\nShort"))
 p3_box <- ggboxplot(combined_short_long_age, x="variable", y="milidiv", fill="variable", width=0.6, lwd=1) +scale_fill_npg()
-p3_box <- p3_box + stat_compare_means(comparisons = my_comparisons,  label.y=c(310, 310), label = "p.signif", method="t.test")
-p3_box <- p3_box+ xlab("")+ylab("Age (milliDiv)")+My_Theme+ theme(legend.position="none")
-p3_box <- p3_box+ggtitle("Mean (Detected TEs divergence)")+scale_y_continuous(limits=c(150, 340), breaks=c(200, 250, 300), labels=c(200, 250, 300))
+p3_box <- p3_box + stat_compare_means(comparisons = my_comparisons,  label.y=c(31, 31), label = "p.signif", method="t.test")
+p3_box <- p3_box+ xlab("")+ylab("%Divergence")+My_Theme+ theme(legend.position="none")
+p3_box <- p3_box+ggtitle("Mean (Detected TEs divergence)")+scale_y_continuous(limits=c(15, 34), breaks=c(20, 25, 30), labels=c(20, 25, 30))
 
 ### ---- Figure1-A ---- ###
 ### Unique+Multi
@@ -180,46 +151,48 @@ p4 <- p4 + theme(legend.position="right")
 ### EM can not be the ultimate solution ###
 
 random <- read.delim("https://figshare.com/ndownloader/files/44176565", header=FALSE, comment.char="#")
+telescope_final <- read.delim("https://figshare.com/ndownloader/files/48171586")
+locusmasterte_final <- read.delim("https://figshare.com/ndownloader/files/48171589", comment.char="#")
 
 EM_not_ultimate <- hg38_gencode_rmsk_indi[,c(13,10)]
-EM_not_ultimate$average <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),9])
-EM_not_ultimate$random <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),8])
-EM_not_ultimate$uniq <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),6])
-EM_not_ultimate$aligned <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),5])
+EM_not_ultimate$best <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),9])
+EM_not_ultimate$final_count <- unlist(telescope_final[match(EM_not_ultimate$indi_label_final,telescope_final$transcript),2])
+EM_not_ultimate$locusmaster <- unlist(locusmasterte_final[match(EM_not_ultimate$indi_label_final,locusmasterte_final$transcript),2])
 
-EM_not_ultimate <- EM_not_ultimate[,c(1,3,4,5,6)]
+EM_not_ultimate <- EM_not_ultimate[,c(1,3,4,5)]
 EM_not_ultimate[is.na(EM_not_ultimate)] <- 0
-EM_not_ultimate <- EM_not_ultimate[rowSums(EM_not_ultimate[,2:5])>0,]
-EM_not_ultimate$em_fail <- as.numeric(EM_not_ultimate$random)-as.numeric(EM_not_ultimate$average)
-EM_not_ultimate$em_need <- as.numeric(EM_not_ultimate$aligned)-as.numeric(EM_not_ultimate$uniq)
+EM_not_ultimate <- EM_not_ultimate[rowSums(EM_not_ultimate[,2:4])>0,]
+EM_not_ultimate$em_fail <- as.numeric(EM_not_ultimate$best)-as.numeric(EM_not_ultimate$final_count)
+EM_not_ultimate$em_solve <- as.numeric(EM_not_ultimate$locusmaster)-as.numeric(EM_not_ultimate$final_count)
 EM_not_ultimate <- EM_not_ultimate[order(EM_not_ultimate$indi_label_final),]
 EM_not_ultimate <- EM_not_ultimate[21142:nrow(EM_not_ultimate),]
+
+add_fig <- data.frame(c("Total","telescope_suc","Em_fail","unsolved"))
+add_fig <- cbind(add_fig, "num"=c(nrow(EM_not_ultimate), nrow(EM_not_ultimate[EM_not_ultimate$em_fail==0 ,]),nrow(EM_not_ultimate[EM_not_ultimate$em_fail !=0,]),nrow(EM_not_ultimate[EM_not_ultimate$em_fail !=0 & EM_not_ultimate$em_solve ==0,])))
+add_fig <- rbind(add_fig, c("locusmaster_suc",(add_fig[1,2]-add_fig[4,2])))
+add_fig_pie <- add_fig[c(2:5),]
+add_fig_pie$num <- as.numeric(add_fig_pie$num)
 
 ## EM effected ones age
 EM_not_ultimate$label <- hg38_gencode_rmsk_indi[match(EM_not_ultimate$indi_label_final,hg38_gencode_rmsk_indi$indi_label_final),"label"]
 EM_not_ultimate$age <- unlist(hg38_repeatmasker[match(EM_not_ultimate$label,hg38_repeatmasker$label),3])
+EM_not_ultimate$age <- EM_not_ultimate$age *0.1
 EM_not_ultimate$em <- "EM successfully\nconclude"
-EM_not_ultimate$em[EM_not_ultimate$em_fail !=0  | EM_not_ultimate$em_need!=0] <- "EM fails\nto conclude"
+EM_not_ultimate$em[EM_not_ultimate$em_fail !=0] <- "EM fails\nto conclude"
 
-em_age <- ggboxplot(EM_not_ultimate, x="em", y="age", fill="em", width=0.6, lwd=1) +scale_fill_manual(values=c("#661100", "#44AA99"))
+em_age <- ggboxplot(EM_not_ultimate, x="em", y="age", fill="em", width=0.3, lwd=1) +scale_fill_manual(values=c("#661100", "#44AA99"))
 em_age <- em_age + stat_compare_means( label = "p.signif", method="t.test")
-em_age <- em_age+ xlab("")+ylab("Age (milliDiv)")+My_Theme+ theme(legend.position="none") 
+em_age <- em_age+ xlab("")+ylab("%Divergence")+My_Theme+ theme(legend.position="none") 
 em_age <- em_age+ggtitle("Mean (Detected TEs divergence)")
-
-
-## number of cases where EM can not conclude
-add_fig <- data.frame(c("Total","Unique","Em_fail"))
-add_fig <- cbind(add_fig, "num"=c(nrow(EM_not_ultimate), nrow(EM_not_ultimate[EM_not_ultimate$em_need==0,]),nrow(EM_not_ultimate[EM_not_ultimate$em_fail !=0 | EM_not_ultimate$em_need!=0,])))
-add_fig_pie <- add_fig[c(2:3),]
-add_fig_pie$num <- as.numeric(add_fig_pie$num)
 
 ## bar chart
 add_fig_pie$text <- add_fig_pie$num*100/as.numeric(add_fig[1,2])
 add_fig_pie$text <- format(round(as.numeric(add_fig_pie$text),3), nsmall = 2)
 add_fig_pie$final_text <- paste(add_fig_pie$num, paste0(round(as.numeric(add_fig_pie$text)),"%"), sep="\n")
-add_fig_pie$group <- c("EM successfully\nconclude","EM fails\nto conclude")
-add_fig_pie$final_group <- c("TE")
-p_bar_chart <- ggplot(add_fig_pie, aes(x=final_group, y=num, fill=group))+geom_col(width=0.6)
+add_fig_pie$group <- c("EM successfully\nconclude","EM fails\nto conclude","EM fails\nto conclude","EM successfully\nconclude")
+add_fig_pie$tool <- c("Telescope","Telescope","LocusMasterTE","LocusMasterTE")
+add_fig_pie$text <- as.numeric(add_fig_pie$text)
+p_bar_chart <- ggplot(add_fig_pie, aes(x=tool, y=text, fill=group))+geom_col(width=0.4)
 p_bar_chart <- p_bar_chart +My_Theme + scale_fill_manual(values=c("#661100", "#44AA99"))
-p_bar_chart <- p_bar_chart+xlab("Expressed TEs (N=626580)") + ylab("Number of TEs")
-p_bar_chart <- p_bar_chart + ggtitle("Overview of TEs captured by Telescope")+theme(legend.position="right")
+p_bar_chart <- p_bar_chart+xlab("Captured TEs (N=625591)") + ylab("Percentage (%)")
+p_bar_chart <- p_bar_chart +theme(legend.position="bottom") + coord_flip()
