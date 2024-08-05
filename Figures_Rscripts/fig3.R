@@ -266,7 +266,4 @@ histone_own$chr <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), f
 histone_own$str <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), function(x) x[2], simplify=FALSE))
 histone_own$end <- unlist(sapply(strsplit(histone_own$label, "|", fixed=TRUE), function(x) x[3], simplify=FALSE))
 
-write.table(histone_own[histone_own$label_diff == "high_mixed", 7:9], "~/bigger1_Corrected_in_modified_telescope.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
-write.table(histone_own[histone_own$label_diff == "high_short", 7:9], "~/bigger1_Incorrectly_measured_in_original_telescope.bed", row.names=FALSE, col.names=FALSE, sep="\t", quote=FALSE)
-
 
