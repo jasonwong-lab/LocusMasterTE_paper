@@ -12,7 +12,7 @@ Containing supplementary information about data used.
 1. Used_SG-Nex_accession_list.xlsx: Excel file contains information about used samples in SG-NEx study with sample ID.
 2. Processed_long_read.xlsx: Links directed to "processed long-read TPM counts" readily used as long-read input in LocusMasterTE.\
 6 samples with 5 different cell lines. Two HCT116 samples exist generated from our lab and SG-NEx study.
-
+3. ENCODE histone ChIP-seq list.xlsx: ENCODE files links for histone ChIP analysis 
 
 ### preprocessing_commands.sh
 Important commands use to preprocess samples. Largely contains three major parts.
