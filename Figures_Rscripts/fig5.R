@@ -11,7 +11,7 @@ library(ref_genome, character.only = TRUE)
 library(gridExtra)
 library(lsa)
 
-mut_mat <- read.delim("https://figshare.com/ndownloader/files/44481518")
+mut_mat <- read.delim("https://figshare.com/ndownloader/files/52072598")
 mut_mat$average_common <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "common")])
 mut_mat$average_lasTEq <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "mod")])
 mut_mat$average_coding_gene <- rowMeans(mut_mat[,str_detect(colnames(mut_mat), "coding_gene")])
