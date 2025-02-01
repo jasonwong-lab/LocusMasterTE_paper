@@ -10,12 +10,12 @@ My_Theme = theme(legend.text = element_text(size=10), legend.title = element_bla
 ### ---- Figure1-B ---- ###
 
 ## Load the Datasets ##
-short_read <- read.delim("https://figshare.com/ndownloader/files/44176550", comment.char="#")
-long_read <- read.delim("https://figshare.com/ndownloader/files/39037991", comment.char="#")
+short_read <- read.delim("https://figshare.com/ndownloader/files/52072676", comment.char="#")
+long_read <- read.delim("https://figshare.com/ndownloader/files/52072673", comment.char="#")
 
 ## change to TPM counts
-long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/44176547", comment.char="#")
-short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/44176556", comment.char="#")
+long_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/52072667", comment.char="#")
+short_read_fc_coding_gene_cleanup <- read.delim("https://figshare.com/ndownloader/files/52072670", comment.char="#")
 short_read_fc_coding_gene_cleanup$rate <- as.numeric(short_read_fc_coding_gene_cleanup[,7]) / as.numeric(short_read_fc_coding_gene_cleanup$Length)
 long_read_fc_coding_gene_cleanup$rate <- as.numeric(long_read_fc_coding_gene_cleanup[,7]) / as.numeric(long_read_fc_coding_gene_cleanup$Length)
 
@@ -150,9 +150,9 @@ p4 <- p4 + theme(legend.position="right")
 ### ---- Figure1-D and E ---- ###
 ### EM can not be the ultimate solution ###
 
-random <- read.delim("https://figshare.com/ndownloader/files/44176565", header=FALSE, comment.char="#")
-telescope_final <- read.delim("https://figshare.com/ndownloader/files/48171586")
-locusmasterte_final <- read.delim("https://figshare.com/ndownloader/files/48171589", comment.char="#")
+random <- read.delim("https://figshare.com/ndownloader/files/52072664", header=FALSE, comment.char="#")
+telescope_final <- read.delim("https://figshare.com/ndownloader/files/52072661")
+locusmasterte_final <- read.delim("https://figshare.com/ndownloader/files/52072658", comment.char="#")
 
 EM_not_ultimate <- hg38_gencode_rmsk_indi[,c(13,10)]
 EM_not_ultimate$best <- unlist(random[match(EM_not_ultimate$indi_label_final,random$V1),9])
